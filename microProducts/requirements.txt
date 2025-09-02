@@ -1,0 +1,8 @@
+Flask==2.3.3
+flask-cors==6.0.1
+Flask-MySQLdb==1.0.1
+Flask-SQLAlchemy==3.1.1
+mysqlclient==2.1.1
+flask-consulate==0.2.0
+consulate==0.6.0
+six==1.16.0

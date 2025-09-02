@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from users.controllers.user_controller import user_controller
+from orders.controllers.order_controller import order_controller
 from db.db import db
 from flask_cors import CORS
 from flask_consulate import Consul
@@ -26,18 +26,18 @@ consul = Consul(app=app)
 consul.apply_remote_config(namespace='mynamespace/')
 # Register Consul service:
 consul.register_service(
-    name='users-microservice',
+    name='orders-microservice',
     interval='10s',
-    tags=['microservice', 'users' ],
-    port=5002,
-    httpcheck='http://users:5002/healthcheck'
+    tags=['microservice', 'orders' ],
+    port=5004,
+    httpcheck='http://orders:5004/healthcheck'
 )
 
 app.config.from_object('config.Config')
 db.init_app(app)
 
 # Registrando el blueprint del controlador de usuarios
-app.register_blueprint(user_controller)
+app.register_blueprint(order_controller)
 
 if __name__ == '__main__':
     app.run()

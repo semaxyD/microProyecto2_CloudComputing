@@ -26,9 +26,11 @@ def get_user(user_id):
 @user_controller.route('/api/users', methods=['POST'])
 def create_user():
     print("creando usuario")
+    import bcrypt
     data = request.json
-    #new_user = Users(name="oscar", email="oscar@gmail", username="omondragon", password="123")
-    new_user = Users(name=data['name'], email=data['email'], username=data['username'], password=data['password'])
+    password = data['password']
+    hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    new_user = Users(name=data['name'], email=data['email'], username=data['username'], password=hashed.decode('utf-8'))
     db.session.add(new_user)
     db.session.commit()
     return jsonify({'message': 'User created successfully'}), 201
@@ -70,7 +72,8 @@ def login():
         return jsonify({'message': 'Invalid username or password'}), 401
 
     #if not check_password_hash(user.password, password):
-    if user.password != password:
+    import bcrypt
+    if not bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
         return jsonify({'message': 'Invalid username or password'}), 401
 
     # Store user information in session

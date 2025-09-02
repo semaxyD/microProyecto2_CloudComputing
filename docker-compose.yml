@@ -1,0 +1,99 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: myflaskapp
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-net
+
+  consul-server:
+    image: consul:1.15
+    container_name: consul-server
+    command: "agent -server -bootstrap -ui -client=0.0.0.0"
+    ports:
+      - "8500:8500"
+    networks:
+      - app-net
+
+  consul-client:
+    image: consul:1.15
+    container_name: consul-client
+    command: "agent -retry-join=consul-server -client=0.0.0.0 -config-dir=/consul/config"
+    depends_on:
+      - consul-server
+    networks:
+      - app-net
+
+  users:
+    build: ./microUsers
+    container_name: users
+    ports:
+      - "5002:5002"
+    depends_on:
+      - mysql
+      - consul-client
+      - consul-server
+    environment:
+      CONSUL_HOST: consul-server
+      CONSUL_PORT: "8500"
+      CONSUL_SCHEME: http
+    restart: unless-stopped
+    networks:
+      - app-net
+
+  products:
+    build: ./microProducts
+    container_name: products
+    ports:
+      - "5003:5003"
+    depends_on:
+      - mysql
+      - consul-client
+      - consul-server
+    environment:
+      CONSUL_HOST: consul-server
+      CONSUL_PORT: "8500"
+      CONSUL_SCHEME: http
+    restart: unless-stopped
+    networks:
+      - app-net
+
+  orders:
+    build: ./microOrders
+    container_name: orders
+    ports:
+      - "5004:5004"
+    depends_on:
+      - mysql
+      - consul-client
+      - consul-server
+    environment:
+      CONSUL_HOST: consul-server
+      CONSUL_PORT: "8500"
+      CONSUL_SCHEME: http
+    restart: unless-stopped
+    networks:
+      - app-net
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "5001:5001"
+    depends_on:
+      - users
+      - products
+      - consul-client
+    networks:
+      - app-net
+
+networks:
+  app-net:
+    driver: bridge
