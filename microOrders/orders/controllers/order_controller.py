@@ -75,7 +75,8 @@ def create_order():
     # Actualizar inventario en microProducts
     for up in updated_products:
         try:
-            requests.put(f'http://products:5003/api/products/{up['id']}', json={
+            product_id = up["id"]
+            requests.put(f"http://products:5003/api/products/{product_id}",json={
                 'stock': up['new_stock'],
                 'name': '',
                 'description': '',

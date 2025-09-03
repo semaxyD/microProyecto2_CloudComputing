@@ -1,5 +1,5 @@
 function getProducts() {
-    fetch('http://192.168.80.3:5003/api/products', {
+    fetch('http://localhost:5003/api/products', {
      method: 'GET',
      headers: {
         'Content-Type': 'application/json'
@@ -81,7 +81,7 @@ function createProduct() {
         quantity: document.getElementById('quantity').value
     };
 
-    fetch('http://192.168.80.3:5003/api/products', {
+    fetch('http://localhost:5003/api/products', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ function updateProduct() {
         quantity: document.getElementById('quantity').value
     };
 
-    fetch(`http://192.168.80.3:5003/api/products/${productId}`, {
+    fetch(`http://localhost:5003/api/products/${productId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -145,7 +145,7 @@ function updateProduct() {
 function deleteProduct(productId) {
     console.log('Deleting product with ID:', productId);
     if (confirm('Are you sure you want to delete this product?')) {
-        fetch(`http://192.168.80.3:5003/api/products/${productId}`, {
+        fetch(`http://localhost:5003/api/products/${productId}`, {
             method: 'DELETE',
         })
         .then(response => {
@@ -200,7 +200,7 @@ function orderProducts() {
   };
 
   // Enviar los datos de la orden al endpoint
-  fetch('http://192.168.80.3:5004/api/orders', {
+  fetch('http://localhost:5004/api/orders', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(orderData),

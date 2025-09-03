@@ -36,6 +36,8 @@ services:
     container_name: users
     ports:
       - "5002:5002"
+    volumes:
+      - ./microUsers:/app
     depends_on:
       - mysql
       - consul-client
@@ -53,6 +55,8 @@ services:
     container_name: products
     ports:
       - "5003:5003"
+    volumes:
+      - ./microProducts:/app
     depends_on:
       - mysql
       - consul-client
@@ -70,6 +74,8 @@ services:
     container_name: orders
     ports:
       - "5004:5004"
+    volumes:
+      - ./microOrders:/app
     depends_on:
       - mysql
       - consul-client
@@ -87,6 +93,8 @@ services:
     container_name: frontend
     ports:
       - "5001:5001"
+    volumes:
+      - ./frontend:/app
     depends_on:
       - users
       - products

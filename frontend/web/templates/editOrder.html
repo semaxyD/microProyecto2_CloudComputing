@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Detail</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container">
+    <h2>Order Detail</h2>
+    <a href="/orders" class="btn btn-primary mb-3">Back to Orders</a>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Order #<span id="order-id"></span></h5>
+            <p class="card-text"><strong>User:</strong> <span id="user-name"></span> (<span id="user-email"></span>)</p>
+            <p class="card-text"><strong>Total:</strong> $<span id="order-total"></span></p>
+            <p class="card-text"><strong>Date:</strong> <span id="order-date"></span></p>
+
+            <h6>Products</h6>
+            <ul id="order-products" class="list-group"></ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    const orderId = document.getElementById('order-id').textContent
+    fetch(`http://localhost:5004/api/orders/${orderId}`)
+      .then(r => r.json())
+      .then(data => {
+        document.getElementById('order-id').textContent = data.id
+        document.getElementById('user-name').textContent = data.userName
+        document.getElementById('user-email').textContent = data.userEmail
+        document.getElementById('order-total').textContent = data.saleTotal
+        document.getElementById('order-date').textContent = data.date || ''
+        const list = document.getElementById('order-products')
+        list.innerHTML = ''
+        ;(data.products || []).forEach(p => {
+          const li = document.createElement('li')
+          li.className = 'list-group-item'
+          li.textContent = `Product ${p.id} x ${p.quantity}`
+          list.appendChild(li)
+        })
+      })
+      .catch(err => console.error('Error:', err))
+</script>
+
+</body>
+</html>
+
+
