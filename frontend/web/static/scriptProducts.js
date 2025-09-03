@@ -29,15 +29,20 @@ function getProducts() {
                 nameCell.textContent = product.name;
                 row.appendChild(nameCell);
 
+                // Description
+                var descCell = document.createElement('td');
+                descCell.textContent = product.description;
+                row.appendChild(descCell);
+
                 // Price
                 var priceCell = document.createElement('td');
                 priceCell.textContent = product.price;
                 row.appendChild(priceCell);
 
-                // Quantity
-                var quantityCell = document.createElement('td');
-                quantityCell.textContent = product.quantity;
-                row.appendChild(quantityCell);
+                // Stock
+                var stockCell = document.createElement('td');
+                stockCell.textContent = product.stock;
+                row.appendChild(stockCell);
 
 		// Order
 		var orderInput = document.createElement('input');
@@ -51,7 +56,6 @@ function getProducts() {
                 // Edit link
                 var editLink = document.createElement('a');
                 editLink.href = `/editProduct/${product.id}`;
-                //editLink.href = `edit.html?id=${product.id}`;
                 editLink.textContent = 'Edit';
                 editLink.className = 'btn btn-primary mr-2';
                 actionsCell.appendChild(editLink);
@@ -77,8 +81,9 @@ function getProducts() {
 function createProduct() {
     var data = {
         name: document.getElementById('name').value,
+        description: document.getElementById('description').value,
         price: document.getElementById('price').value,
-        quantity: document.getElementById('quantity').value
+        stock: document.getElementById('stock').value
     };
 
     fetch('http://localhost:5003/api/products', {
@@ -112,8 +117,9 @@ function updateProduct() {
     var productId = document.getElementById('product-id').value;
     var data = {
         name: document.getElementById('name').value,
+        description: document.getElementById('description').value,
         price: document.getElementById('price').value,
-        quantity: document.getElementById('quantity').value
+        stock: document.getElementById('stock').value
     };
 
     fetch(`http://localhost:5003/api/products/${productId}`, {

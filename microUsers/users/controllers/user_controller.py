@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, session, g
+from flask import Blueprint, request, jsonify, session, g, current_app
 from users.models.user_model import Users
 from db.db import db
 from datetime import timedelta
@@ -73,17 +73,27 @@ def login():
 
     #if not check_password_hash(user.password, password):
     import bcrypt
-    if not bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
+    print('Password ingresada:', password)
+    print('Hash en BD:', user.password)
+    resultado = bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8'))
+    print('Resultado bcrypt:', resultado)
+    if not resultado:
         return jsonify({'message': 'Invalid username or password'}), 401
 
+    import jwt
+    import datetime
     # Store user information in session
     session['user_id'] = user.id
     session['username'] = user.username
-    session['email'] = user.email  # Add other user information as needed
+    session['email'] = user.email
 
-    #g.user=user
-
-    #print(g.__dict__)
+    # Generar JWT
+    payload = {
+        'user_id': user.id,
+        'username': user.username,
+        'email': user.email,
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=2)
+    }
+    token = jwt.encode(payload, current_app.config['SECRET_KEY'], algorithm='HS256')
     print("En session: ",session)
-
-    return jsonify({'message': 'Login successful'})
+    return jsonify({'message': 'Login successful', 'token': token})

@@ -82,26 +82,39 @@ function addProductRow() {
 }
 
 function createOrder() {
-  var userName = document.getElementById('userName').value;
-  var userEmail = document.getElementById('userEmail').value;
+  var userName = document.getElementById('userName').value.trim();
+  var userEmail = document.getElementById('userEmail').value.trim();
   var products = [];
   var rows = document.querySelectorAll('#products-table tbody tr');
   rows.forEach(r => {
-    var id = r.querySelector('td:nth-child(1) input').value;
-    var qty = parseInt(r.querySelector('td:nth-child(2) input').value || '0');
-    if (id && qty > 0) {
-      products.push({ id: id, quantity: qty });
+    var id = r.querySelector('td:nth-child(1) input').value.trim();
+    var qty = Number(r.querySelector('td:nth-child(2) input').value || '0');
+    if (id && !isNaN(qty) && qty > 0) {
+      products.push({ id: Number(id), quantity: qty });
     }
   });
+
+  // Validación antes de enviar
+  if (!userName || !userEmail) {
+    alert('Por favor, ingresa nombre y correo de usuario.');
+    return;
+  }
+  if (products.length === 0) {
+    alert('Agrega al menos un producto con cantidad válida.');
+    return;
+  }
+
+  const orderData = {
+    user: { name: userName, email: userEmail },
+    products: products
+  };
+  console.log('Datos enviados a /api/orders:', orderData);
 
   fetch('http://localhost:5004/api/orders', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
-    body: JSON.stringify({
-      user: { name: userName, email: userEmail },
-      products: products
-    })
+    body: JSON.stringify(orderData)
   })
     .then(r => {
       if (!r.ok) throw new Error('Request failed');

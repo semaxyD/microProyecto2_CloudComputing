@@ -34,6 +34,8 @@ consul.register_service(
 )
 
 app.config.from_object('config.Config')
+app.secret_key = app.config['SECRET_KEY']
+print('SECRET_KEY en Flask:', app.secret_key)
 db.init_app(app)
 
 # Registrando el blueprint del controlador de usuarios

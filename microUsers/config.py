@@ -5,4 +5,5 @@ class Config:
     MYSQL_DB = 'myflaskapp'
     SQLALCHEMY_DATABASE_URI = f'mysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}/{MYSQL_DB}'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECRET_KEY = 'super_secret_key_2025'
 

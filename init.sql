@@ -1,53 +1,54 @@
+
 CREATE DATABASE IF NOT EXISTS myflaskapp;
 USE myflaskapp;
 
+-- Tabla de usuarios
 CREATE TABLE IF NOT EXISTS users (
-    id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    name varchar(255),
-    email varchar(255),
-    username varchar(255),
-    password varchar(255)
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    email VARCHAR(255),
+    username VARCHAR(255),
+    password VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS products (
-    id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    name varchar(255),
-    price int,
-    quantity int,
-    description varchar(255) NOT NULL DEFAULT '',
-    stock int NOT NULL DEFAULT 0
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    price INT NOT NULL,
+    description VARCHAR(255) NOT NULL DEFAULT '',
+    stock INT NOT NULL DEFAULT 0
 );
 
+-- Tabla de órdenes
 CREATE TABLE IF NOT EXISTS orders (
-    id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    userName varchar(255),
-    userEmail varchar(255),
-    saleTotal decimal(10,2),
-    products text,
-    date datetime default current_timestamp
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    userName VARCHAR(255),
+    userEmail VARCHAR(255),
+    saleTotal DECIMAL(10,2),
+    products TEXT,
+    date DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Seed solo si la tabla está vacía
-INSERT INTO users (name, email, username, password)
-SELECT name, email, username, password
-FROM (
-    SELECT 'juan'  AS name, 'juan@gmail.com'  AS email, 'juan'  AS username, '$2y$12$aEYylzcB/AnKx6gY7QyQieAc8UPL05.LOIJfiCY0ryvllwhsJfbay'  AS password UNION ALL
-    SELECT 'maria' AS name, 'maria@gmail.com' AS email, 'maria' AS username, '$2y$12$YCl/JoI5e4LysGKzKPMA4eWO6LVc9yoFIQ5njCFbRDqdFN7BJuddi'  AS password UNION ALL
-    SELECT 'oscar' AS name, 'oscar@gmail.com' AS email, 'oscar' AS username, '789'  AS password UNION ALL
-    SELECT 'ana'   AS name, 'ana@gmail.com'   AS email, 'ana'   AS username, 'abc'  AS password UNION ALL
-    SELECT 'pedro' AS name, 'pedro@gmail.com' AS email, 'pedro' AS username, 'xyz'  AS password UNION ALL
-    SELECT 'lucia' AS name, 'lucia@gmail.com' AS email, 'lucia' AS username, 'pass1' AS password
-) AS seed
-WHERE NOT EXISTS (SELECT 1 FROM users LIMIT 1);
+-- Datos de ejemplo para usuarios
+INSERT INTO users (name, email, username, password) VALUES
+    ('juan', 'juan@gmail.com', 'juan', '$2y$12$aEYylzcB/AnKx6gY7QyQieAc8UPL05.LOIJfiCY0ryvllwhsJfbay'),
+    ('maria', 'maria@gmail.com', 'maria', '$2y$12$YCl/JoI5e4LysGKzKPMA4eWO6LVc9yoFIQ5njCFbRDqdFN7BJuddi'),
+    ('oscar', 'oscar@gmail.com', 'oscar', '789'),
+    ('ana', 'ana@gmail.com', 'ana', 'abc'),
+    ('pedro', 'pedro@gmail.com', 'pedro', 'xyz'),
+    ('lucia', 'lucia@gmail.com', 'lucia', 'pass1');
 
-INSERT INTO products (name, price, quantity)
-SELECT name, price, quantity
-FROM (
-    SELECT 'pc'       AS name, 150 AS price, 10 AS quantity UNION ALL
-    SELECT 'phone'    AS name, 100 AS price, 20 AS quantity UNION ALL
-    SELECT 'tablet'   AS name, 200 AS price, 15 AS quantity UNION ALL
-    SELECT 'monitor'  AS name,  80 AS price, 25 AS quantity UNION ALL
-    SELECT 'mouse'    AS name,  20 AS price, 50 AS quantity UNION ALL
-    SELECT 'keyboard' AS name,  30 AS price, 40 AS quantity
-) AS seed
-WHERE NOT EXISTS (SELECT 1 FROM products LIMIT 1);
+INSERT INTO products (name, price, description, stock) VALUES
+    ('pc', 150, 'Computadora de escritorio', 10),
+    ('phone', 100, 'Teléfono móvil', 20),
+    ('tablet', 200, 'Tablet 10 pulgadas', 15),
+    ('monitor', 80, 'Monitor LED', 25),
+    ('mouse', 20, 'Mouse óptico', 50),
+    ('keyboard', 30, 'Teclado mecánico', 40);
+INSERT INTO products (name, price, description, stock) VALUES
+    ('pc', 150, 'Computadora de escritorio', 10),
+    ('phone', 100, 'Teléfono móvil', 20),
+    ('tablet', 200, 'Tablet 10 pulgadas', 15),
+    ('monitor', 80, 'Monitor LED', 25),
+    ('mouse', 20, 'Mouse óptico', 50),
+    ('keyboard', 30, 'Teclado mecánico', 40);

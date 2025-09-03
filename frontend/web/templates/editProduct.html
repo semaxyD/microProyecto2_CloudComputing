@@ -13,18 +13,22 @@
     <!-- Agregar enlace para volver a la página de inicio -->
     <a href="/products" class="btn btn-primary mb-3">Back to Home</a>
     <form id="edit-product-form">
-        <input type="hidden" id="product-id" value="">
+    <input type="hidden" id="product-id" value="">
         <div class="form-group">
             <label for="name">Name</label>
             <input type="text" class="form-control" id="name" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <input type="text" class="form-control" id="description" required>
         </div>
         <div class="form-group">
             <label for="price">Price</label>
             <input type="price" class="form-control" id="price" required>
         </div>
         <div class="form-group">
-            <label for="quantity">Quantity</label>
-            <input type="text" class="form-control" id="quantity" required>
+            <label for="stock">Stock</label>
+            <input type="number" class="form-control" id="stock" required>
         </div>
 	<button type="submit" class="btn btn-primary" onclick="updateProduct()">Save Changes</button>
     </form>
@@ -35,16 +39,17 @@
 <script>
     // Obtener el ID del usuario de la URL
     const urlParams = new URLSearchParams(window.location.search);
-    //const productId = urlParams.get('id');
-    const productId = {{id}}    
+    // Obtener el ID del producto de la URL usando el path
+    const productId = window.location.pathname.split('/').pop();
     // Obtener la información del usuario y llenar el formulario
     fetch(`http://localhost:5003/api/products/${productId}`)
         .then(response => response.json())
         .then(data => {
             document.getElementById('product-id').value = data.id;
             document.getElementById('name').value = data.name;
+            document.getElementById('description').value = data.description;
             document.getElementById('price').value = data.price;
-            document.getElementById('quantity').value = data.quantity;
+            document.getElementById('stock').value = data.stock;
         })
         .catch(error => console.error('Error:', error));
 </script>
