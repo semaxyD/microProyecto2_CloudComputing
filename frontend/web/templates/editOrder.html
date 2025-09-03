@@ -30,7 +30,7 @@
     // Función para obtener información de un producto desde el microservicio de productos
     async function getProductInfo(productId) {
         try {
-            const response = await fetch(`http://localhost:5003/api/products/${productId}`);
+            const response = await fetch(`http://192.168.80.3:5003/api/products/${productId}`);
             if (!response.ok) {
                 throw new Error(`Error al obtener producto ${productId}`);
             }
@@ -61,7 +61,7 @@
     // Mostrar indicador de carga
     document.getElementById('order-products').innerHTML = '<li class="list-group-item">Cargando productos...</li>';
 
-    fetch(`http://localhost:5004/api/orders/${orderId}`)
+    fetch(`http://192.168.80.3:5004/api/orders/${orderId}`)
       .then(r => r.json())
       .then(async data => {
         document.getElementById('order-id').textContent = data.id

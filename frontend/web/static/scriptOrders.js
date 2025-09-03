@@ -1,5 +1,5 @@
 function getOrders() {
-  fetch('http://localhost:5004/api/orders', {
+  fetch('http://192.168.80.3:5004/api/orders', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'
@@ -112,7 +112,7 @@ function createOrder() {
   };
   console.log('Datos enviados a /api/orders:', orderData);
 
-  fetch('http://localhost:5004/api/orders', {
+  fetch('http://192.168.80.3:5004/api/orders', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
