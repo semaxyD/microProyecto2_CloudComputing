@@ -39,7 +39,7 @@
 <script>
     // Obtener el ID del usuario de la URL
     const urlParams = new URLSearchParams(window.location.search);
-    const userId = urlParams.get('id');
+    const userId = window.location.pathname.split('/').pop();
     // Obtener la información del usuario y llenar el formulario
     fetch(`http://192.168.80.3:5002/api/users/${userId}`)
         .then(response => response.json())

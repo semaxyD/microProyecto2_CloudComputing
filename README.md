@@ -31,7 +31,7 @@ export FLASK_APP=run.py
 /usr/local/bin/flask run --host=0.0.0.0 --port 5003
 ```
 
-## Run the Oders Microservice
+## Run the Orders Microservice
 
 ```
 cd /home/vagrant/microOrders

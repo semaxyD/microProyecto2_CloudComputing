@@ -45,11 +45,11 @@ app.register_blueprint(product_controller)
 
 @app.after_request
 def apply_cors_headers(response):
-    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:5001'
+    response.headers['Access-Control-Allow-Origin'] = 'http://192.168.80.3:5001'
     response.headers['Access-Control-Allow-Credentials'] = 'true'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
     response.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,DELETE,OPTIONS'
     return response
 
 if __name__ == '__main__':
-	app.run()
+	app.run()	
