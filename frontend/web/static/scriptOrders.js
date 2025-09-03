@@ -82,9 +82,11 @@ function addProductRow() {
 }
 
 function createOrder() {
+
   var userName = document.getElementById('userName').value.trim();
   var userEmail = document.getElementById('userEmail').value.trim();
   var products = [];
+
   var rows = document.querySelectorAll('#products-table tbody tr');
   rows.forEach(r => {
     var id = r.querySelector('td:nth-child(1) input').value.trim();

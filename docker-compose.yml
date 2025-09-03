@@ -96,9 +96,17 @@ services:
     volumes:
       - ./frontend:/app
     depends_on:
+      - mysql
       - users
       - products
+      - orders
       - consul-client
+      - consul-server
+    environment:
+      CONSUL_HOST: consul-server
+      CONSUL_PORT: "8500"
+      CONSUL_SCHEME: http
+    restart: unless-stopped
     networks:
       - app-net
 

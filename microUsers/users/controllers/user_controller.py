@@ -96,4 +96,4 @@ def login():
     }
     token = jwt.encode(payload, current_app.config['SECRET_KEY'], algorithm='HS256')
     print("En session: ",session)
-    return jsonify({'message': 'Login successful', 'token': token})
+    return jsonify({'message': 'Login successful', 'token': token, 'user_id': user.id, 'username': user.username, 'email': user.email})

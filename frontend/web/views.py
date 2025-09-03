@@ -1,10 +1,38 @@
 from flask import Flask, render_template
 from flask_cors import CORS
+from flask_consulate import Consul
 
 app = Flask(__name__)
 app.secret_key = 'secret123'
 CORS(app, supports_credentials=True)
 app.config.from_object('config.Config')
+
+@app.route('/healthcheck')
+def health_check():
+    """
+    This function is used to say current status to the Consul.
+    Format: https://www.consul.io/docs/agent/checks.html
+
+    :return: Empty response with status 200, 429 or 500
+    """
+    # TODO: implement any other checking logic.
+    return 'OK', 200
+
+app.config['CONSUL_HOST'] = 'consul-server'
+app.config['CONSUL_PORT'] = 8500
+# Consul
+# This extension should be the first one if enabled:
+consul = Consul(app=app)
+# Fetch the configuration:
+consul.apply_remote_config(namespace='mynamespace/')
+# Register Consul service:
+consul.register_service(
+    name='frontend-service',
+    interval='10s',
+    tags=['frontend', 'web'],
+    port=5001,
+    httpcheck='http://frontend:5001/healthcheck'
+)
 
 
 # Ruta para renderizar el template index.html

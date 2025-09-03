@@ -26,25 +26,82 @@
 </div>
 
 <script>
-    const orderId = document.getElementById('order-id').textContent
+
+    // Función para obtener información de un producto desde el microservicio de productos
+    async function getProductInfo(productId) {
+        try {
+            const response = await fetch(`http://localhost:5003/api/products/${productId}`);
+            if (!response.ok) {
+                throw new Error(`Error al obtener producto ${productId}`);
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('Error obteniendo producto:', error);
+            return { id: productId, name: 'Producto no encontrado', price: 0, description: '' };
+        }
+    }
+
+    // Función para obtener información completa de todos los productos de la orden
+    async function getProductsInfo(products) {
+        const productPromises = products.map(async (product) => {
+            const productInfo = await getProductInfo(product.id);
+            return {
+                ...product,
+                name: productInfo.name,
+                price: productInfo.price,
+                description: productInfo.description
+            };
+        });
+        return await Promise.all(productPromises);
+    }
+
+    // Obtener el ID de la orden de la URL, viene asi: /editOrder/1
+    const orderId = window.location.pathname.split('/').pop();
+
+    // Mostrar indicador de carga
+    document.getElementById('order-products').innerHTML = '<li class="list-group-item">Cargando productos...</li>';
+
     fetch(`http://localhost:5004/api/orders/${orderId}`)
       .then(r => r.json())
-      .then(data => {
+      .then(async data => {
         document.getElementById('order-id').textContent = data.id
         document.getElementById('user-name').textContent = data.userName
         document.getElementById('user-email').textContent = data.userEmail
         document.getElementById('order-total').textContent = data.saleTotal
         document.getElementById('order-date').textContent = data.date || ''
-        const list = document.getElementById('order-products')
-        list.innerHTML = ''
-        ;(data.products || []).forEach(p => {
-          const li = document.createElement('li')
-          li.className = 'list-group-item'
-          li.textContent = `Product ${p.id} x ${p.quantity}`
-          list.appendChild(li)
-        })
+
+        // Obtener información completa de los productos
+        if (data.products && data.products.length > 0) {
+            const productsWithInfo = await getProductsInfo(data.products);
+
+            const list = document.getElementById('order-products')
+            list.innerHTML = ''
+
+            productsWithInfo.forEach(p => {
+                const li = document.createElement('li')
+                li.className = 'list-group-item d-flex justify-content-between align-items-center'
+                li.innerHTML = `
+                    <div>
+                        <strong>${p.name}</strong>
+                        <br>
+                        <small class="text-muted">${p.description || 'Sin descripción'}</small>
+                    </div>
+                    <div class="text-right">
+                        <div>Cantidad: ${p.quantity}</div>
+                        <div>Precio unitario: $${p.price}</div>
+                        <div><strong>Subtotal: $${(p.price * p.quantity).toFixed(2)}</strong></div>
+                    </div>
+                `
+                list.appendChild(li)
+            })
+        } else {
+            document.getElementById('order-products').innerHTML = '<li class="list-group-item">No hay productos en esta orden</li>'
+        }
       })
-      .catch(err => console.error('Error:', err))
+      .catch(err => {
+        console.error('Error:', err)
+        document.getElementById('order-products').innerHTML = '<li class="list-group-item text-danger">Error al cargar los productos</li>'
+      })
 </script>
 
 </body>

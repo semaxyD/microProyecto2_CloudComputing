@@ -178,6 +178,9 @@ function handleLogin(event) {
   .then(data=> {
     // Store the token in local storage
     localStorage.setItem('token', data.token);
+    localStorage.setItem('user_id', data.user_id);
+    localStorage.setItem('username', data.username);
+    localStorage.setItem('email', data.email);
 
     // Redirect to the desired page after successful login
     window.location.href = '/dashboard'; // Replace with your desired redirect URL

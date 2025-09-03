@@ -199,8 +199,8 @@ function orderProducts() {
   // Preparar los datos de la orden
   const orderData = {
     user: {
-      name: sessionStorage.getItem('username'),
-      email: sessionStorage.getItem('email')
+      name: localStorage.getItem('username'),
+      email: localStorage.getItem('email')
     },
     products: selectedProducts
   };
