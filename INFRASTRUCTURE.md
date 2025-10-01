@@ -718,15 +718,6 @@ kubectl autoscale deployment users --cpu-percent=50 --min=1 --max=10 -n microsto
     └── cleanup.sh            # Limpiar recursos
 ```
 
-## 🎯 Próximos Pasos
-
-1. **CI/CD Pipeline**: Configurar GitHub Actions para despliegue automático
-2. **SSL/TLS**: Añadir certificados Let's Encrypt
-3. **Backup**: Configurar backup automático de MySQL
-4. **Observabilidad**: Integrar Prometheus y Grafana
-5. **Security**: Implementar Pod Security Standards
-
----
 
 ## 🚀 RESUMEN EJECUTIVO - ORDEN DE COMANDOS COMPLETO
 
@@ -785,4 +776,4 @@ kubectl get all -n microstore
 - **Products API**: `http://[INGRESS-IP]/api/products/`
 - **Orders API**: `http://[INGRESS-IP]/api/orders/`
 
-**🎉 ¡Con estos comandos tendrás MicroStore ejecutándose completamente en Azure AKS!**
+**🎉 ¡Con estos comandos tenemos MicroStore ejecutándose completamente en Azure AKS!**
