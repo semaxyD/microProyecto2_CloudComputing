@@ -232,6 +232,11 @@ kubectl get nodes
 ### 🐳 PASO 5: Construir y Subir Imágenes Docker
 
 **Tienes 2 opciones según tu entorno:**
+### **Ambas opciones te pediran el nombre del ACR,se puede obtener con el siguiente comando
+```bash
+#Busca el nombre de tu Azure Container Registry existente(se creo con Terraform):
+(Get-ChildItem k8s -Recurse -Filter '*.yaml').FullName | ForEach-Object { (Get-Content $_) -replace '<TU_REGISTRY>', 'microstoreacra9545ff1.azurecr.io' | Set-Content $_ }
+```
 
 #### **Opción A: Azure Cloud Shell / Linux** ☁️ (ACR Tasks + Docker híbrido)
 ```bash
@@ -270,102 +275,74 @@ az account show
 #### **Resultado esperado (ambas opciones):**
 ```bash
 # ✅ Output exitoso:
-📊 Resumen del Build:
+Resumen del Build:
 ====================
-✅ Todas las imágenes se construyeron y subieron exitosamente
+OK: Todas las imagenes se construyeron y subieron exitosamente
 
-🎯 Imágenes disponibles en ACR:
-  • microstoreacr[random].azurecr.io/microstore-users:latest
-  • microstoreacr[random].azurecr.io/microstore-products:latest  
-  • microstoreacr[random].azurecr.io/microstore-orders:latest
-  • microstoreacr[random].azurecr.io/microstore-frontend:latest
+Imagenes disponibles en ACR:
+  - microstoreacra9545ff1.azurecr.io/microstore-users:latest
+  - microstoreacra9545ff1.azurecr.io/microstore-products:latest  
+  - microstoreacra9545ff1.azurecr.io/microstore-orders:latest
+  - microstoreacra9545ff1.azurecr.io/microstore-frontend:latest
 
 # 5.3 Verificar imágenes en ACR
-ACR_NAME=$(terraform -chdir=infra/terraform output -raw acr_name)    # Linux/Cloud Shell
-$acrName = terraform -chdir=infra/terraform output -raw acr_name     # PowerShell
-
-az acr repository list --name $ACR_NAME --output table              # Ambos
-# Result
-# ----------------
-# microstore-users
-# microstore-products  
-# microstore-orders
-# microstore-frontend
-```
-
-#### **💡 Ventajas por método:**
-- **☁️ Cloud Shell**: Sin instalaciones locales, perfecto para desarrollo rápido
-- **🪟 PowerShell**: Control total, mejor para debugging, funciona siempre
-
-#### **🔍 Verificar que las imágenes se subieron:**
-```bash
-# 5.4 Verificar imágenes en ACR (ambos métodos)
-# Linux/Cloud Shell:
+# Para Linux/Cloud Shell:
 ACR_NAME=$(terraform -chdir=infra/terraform output -raw acr_name)
-# PowerShell:
-$acrName = terraform -chdir=infra/terraform output -raw acr_name
-
-# Listar todas las imágenes (ambos):
 az acr repository list --name $ACR_NAME --output table
-# Deberías ver:
-# Result
+
+# Para Windows PowerShell:
+cd infra\terraform
+$acrName = terraform output -raw acr_name
+cd ..\..
+az acr repository list --name $acrName --output table
+
+# O directamente con tu ACR específico:
+az acr repository list --name "microstoreacra9545ff1" --output table
+
+# Result esperado:
 # ----------------
 # microstore-users
 # microstore-products  
 # microstore-orders
 # microstore-frontend
-
-# 5.5 Ver detalles de una imagen específica
-az acr repository show-tags --name $ACR_NAME --repository microstore-users --output table
-# Deberías ver el tag "latest"
 ```
+
+#### **💡 Comandos de verificación para PowerShell:**
+```powershell
+# 1. Verificar que el ACR existe y es accesible
+az acr show --name "microstoreacra9545ff1" --query "name" -o tsv
+
+# 2. Listar todas las imágenes en tu ACR
+az acr repository list --name "microstoreacra9545ff1" --output table
+
+# 3. Ver tags específicos de una imagen
+az acr repository show-tags --name "microstoreacra9545ff1" --repository "microstore-users" --output table
+
+# 4. Ver detalles completos de todas las imágenes
+az acr repository list --name "microstoreacra9545ff1" | ConvertFrom-Json | ForEach-Object { Write-Host "Imagen: $_" -ForegroundColor Green }
+
+# 5. Verificar tamaño de las imágenes
+az acr repository show --name "microstoreacra9545ff1" --repository "microstore-users" --query "lastUpdateTime" -o tsv
+```
+
 
 ### 📝 PASO 6: Actualizar Manifiestos con ACR Real
 
-**⚠️ IMPORTANTE**: Los scripts de build automáticamente te dan el comando para hacer este reemplazo
-
-#### **Opción A: Usando el comando que sugiere el script** ⭐ (Recomendada)
-```bash
+#### **🎯 Tu comando específico basado en tu ejecución exitosa:**
+```powershell
 # Después de ejecutar build-images.sh o build-images.ps1, 
-# el script te muestra exactamente qué hacer:
+# el script te dice "Reemplaza placeholders en los archivos YAML con: microstoreacra9545ff1.azurecr.io"
+#Eso haremos con el siguiente comando para powershell
 
-# ✅ Para Linux/Cloud Shell:
-find k8s -name '*.yaml' -exec sed -i "s|<TU_REGISTRY>|microstoreacra9545ff1.azurecr.io|g" {} +
-
-# ✅ Para Windows PowerShell:
+# Comando exacto para tu ACR Reemplazalo por el obtenido con el comando anterior:
 (Get-ChildItem k8s -Recurse -Filter '*.yaml').FullName | ForEach-Object { (Get-Content $_) -replace '<TU_REGISTRY>', 'microstoreacra9545ff1.azurecr.io' | Set-Content $_ }
 ```
 
-#### **Opción B: Manualmente paso a paso** 🔧
 ```bash
-# 6.1 Obtener la URL completa del ACR
-# Linux/Cloud Shell:
-ACR_LOGIN_SERVER=$(terraform -chdir=infra/terraform output -raw acr_login_server)
-# PowerShell:
-$ACR_LOGIN_SERVER = terraform -chdir=infra/terraform output -raw acr_login_server
-
-echo "Tu ACR es: $ACR_LOGIN_SERVER"
-# Ejemplo: microstoreacra9545ff1.azurecr.io
-
-# 6.2 Verificar que los manifiestos tienen placeholders
-grep -r "<TU_REGISTRY>" k8s/                    # Linux
-Select-String -Path k8s\**\*.yaml "<TU_REGISTRY>"  # PowerShell
-# Deberías ver líneas como:
-# k8s/users/deployment.yaml:        image: <TU_REGISTRY>/microstore-users:latest
-
-# 6.3 Reemplazar placeholders con tu ACR real
-# Linux/Cloud Shell:
-find k8s -name '*.yaml' -exec sed -i "s|<TU_REGISTRY>|$ACR_LOGIN_SERVER|g" {} +
-
-# Windows PowerShell:
-(Get-ChildItem k8s -Recurse -Filter "*.yaml").FullName | ForEach-Object { (Get-Content $_) -replace '<TU_REGISTRY>', $ACR_LOGIN_SERVER | Set-Content $_ }
-
-# 6.4 Verificar que se reemplazaron correctamente
-grep -r "azurecr.io" k8s/                                    # Linux
-Select-String -Path k8s\**\*.yaml "azurecr.io"              # PowerShell
-# Ahora deberías ver líneas como:
-# k8s/users/deployment.yaml:        image: microstoreacra9545ff1.azurecr.io/microstore-users:latest
+# Para Linux/Cloud Shell con tu ACR específico:
+find k8s -name '*.yaml' -exec sed -i "s|<TU_REGISTRY>|microstoreacra9545ff1.azurecr.io|g" {} +
 ```
+
 
 ### 🚀 PASO 7: Desplegar la Aplicación (DETALLADO)
 
