@@ -2,13 +2,37 @@
 
 Esta guía te llevará paso a paso desde la creación de la infraestructura en Azure hasta el despliegue completo de la aplicación MicroStore en Kubernetes.
 
-## 📋 Prerrequisitos
+## � OPCIÓN RECOMENDADA: Azure Cloud Shell
+
+**🌟 Para facilitar el proceso, recomendamos usar Azure Cloud Shell:**
+- ✅ **Azure CLI** ya preinstalado y autenticado
+- ✅ **Terraform** ya disponible
+- ✅ **kubectl** preconfigurado  
+- ✅ **Git** y herramientas de desarrollo
+- ✅ **No necesita Docker local** - usaremos ACR Tasks
+- ✅ Acceso directo desde: [shell.azure.com](https://shell.azure.com)
+
+### 🚀 Empezar en Cloud Shell:
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/semaxyD/microProyecto2_CloudComputing.git
+cd microProyecto2_CloudComputing
+
+# 2. Verificar herramientas
+az --version
+terraform --version
+kubectl version --client
+
+# 3. ¡Listo para empezar!
+```
+
+## 📋 Prerrequisitos (Si usas entorno local)
 
 - **Azure CLI** instalado y configurado (`az login`)
 - **Terraform** >= 1.2
-- **Docker** para construir las imágenes
 - **kubectl** para gestionar Kubernetes
 - Suscripción de Azure activa
+- ⚠️ **Para Docker**: O instalar Docker local O usar ACR Tasks (recomendado)
 
 ## � GUÍA PASO A PASO CON AZURE CLI (COMANDOS ESPECÍFICOS)
 
@@ -204,48 +228,32 @@ kubectl get nodes
 # aks-agentpool-xxxxx-vmss000001   Ready    agent   5m    v1.28.3
 ```
 
-```bash
-# Ir al directorio de Terraform
-cd infra/terraform
-
-# Inicializar Terraform
-terraform init
-
-# Revisar el plan de ejecución
-terraform plan
-
-# Aplicar la infraestructura
-terraform apply
-```
-
-**Recursos que se crearán:**
-- 🏢 Resource Group
-- ⚙️ AKS Cluster (2 nodos Standard_B2s)
-- 📦 Azure Container Registry (ACR)
-- 📊 Log Analytics Workspace
-- 🚪 NGINX Ingress Controller
 
 ### 🐳 PASO 5: Construir y Subir Imágenes Docker (DETALLADO)
 
 ```bash
-# 5.1 Verificar que Docker está ejecutándose
-docker --version
-docker ps
-# Si no funciona, inicia Docker Desktop
+# 5.1 Verificar que estás logueado en Azure
+az account show
+# Si no: az login
 
-# 5.2 Ejecutar el script de build automático
+# 5.2 Ejecutar el script de build automático (usa ACR Tasks)
 chmod +x scripts/build-images.sh
 ./scripts/build-images.sh
 
-# El script hace internamente:
+# ☁️ El script usa ACR TASKS (sin Docker local):
 # - Obtiene el ACR name desde Terraform: terraform output -raw acr_name
-# - Hace login: az acr login --name <acr-name>
-# - Build de 4 imágenes:
-#   * docker build -t <acr>.azurecr.io/microstore-users:latest microUsers/
-#   * docker build -t <acr>.azurecr.io/microstore-products:latest microProducts/
-#   * docker build -t <acr>.azurecr.io/microstore-orders:latest microOrders/
-#   * docker build -t <acr>.azurecr.io/microstore-frontend:latest frontend/
-# - Push al ACR: docker push <imagen>
+# - Verifica acceso al ACR: az acr show --name <acr-name>
+# - Build y push con ACR Tasks (cada uno toma 2-5 minutos):
+#   * az acr build --registry <acr> --image microstore-users:latest microUsers/
+#   * az acr build --registry <acr> --image microstore-products:latest microProducts/
+#   * az acr build --registry <acr> --image microstore-orders:latest microOrders/
+#   * az acr build --registry <acr> --image microstore-frontend:latest frontend/
+
+# ✅ VENTAJAS de ACR Tasks vs Docker local:
+# - No necesita Docker instalado localmente
+# - Funciona perfecto en Azure Cloud Shell
+# - Build y push automático en un solo comando
+# - Logs detallados en Azure Portal
 
 # 5.3 Verificar que las imágenes se subieron
 ACR_NAME=$(terraform -chdir=infra/terraform output -raw acr_name)
