@@ -137,7 +137,17 @@ terraform init
 terraform validate
 # Si todo está bien: "Success! The configuration is valid."
 
-# 3.5 Ver qué recursos se van a crear (DRY RUN)
+# 3.5 Registrar los siguientes recursos para que Terraform los encuentre en la subscripcion
+az provider register --namespace Microsoft.ContainerService
+az provider register --namespace Microsoft.Network
+az provider register --namespace Microsoft.Compute
+az provider register --namespace Microsoft.Storage
+az provider register --namespace Microsoft.ContainerRegistry
+az provider register --namespace Microsoft.OperationalInsights
+az provider register --namespace Microsoft.Maintenance
+
+
+# 3.6 Ver qué recursos se van a crear (DRY RUN)
 terraform plan
 # Verás una lista detallada de recursos que se crearán:
 # + azurerm_resource_group.rg
@@ -146,7 +156,7 @@ terraform plan
 # + azurerm_log_analytics_workspace.law
 # + etc.
 
-# 3.6 Aplicar la infraestructura (CREAR TODO)
+# 3.7 Aplicar la infraestructura (CREAR TODO)
 terraform apply
 # Te preguntará: "Do you want to perform these actions?" 
 # Escribe: yes
@@ -159,7 +169,7 @@ terraform apply
 # ✅ Permisos entre AKS y ACR
 # ✅ NGINX Ingress Controller
 
-# 3.7 Verificar que todo se creó correctamente
+# 3.8 Verificar que todo se creó correctamente
 terraform output
 # Verás todos los outputs como:
 # acr_login_server = "microstoreacr1234.azurecr.io"

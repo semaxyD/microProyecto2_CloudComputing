@@ -29,7 +29,7 @@ variable "resource_group_name" {
 variable "location" {
   description = "Región de Azure"
   type        = string
-  default     = "East US"
+  default     = "eastus2"
   
   validation {
     condition = contains([
