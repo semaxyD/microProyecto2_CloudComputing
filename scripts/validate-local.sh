@@ -114,11 +114,11 @@ validate_yaml_files() {
     if [[ -d "$dir" ]]; then
         for file in "$dir"/*.yaml; do
             if [[ -f "$file" ]]; then
-                if kubectl --dry-run=client -f "$file" validate &>/dev/null; then
+                if kubectl apply --dry-run=client -f "$file" &>/dev/null; then
                     print_status "SUCCESS" "$(basename "$file") - Sintaxis válida"
                 else
                     print_status "ERROR" "$(basename "$file") - Error de sintaxis"
-                    kubectl --dry-run=client -f "$file" validate || true
+                    kubectl apply --dry-run=client -f "$file" || true
                     ((errors++))
                 fi
             fi

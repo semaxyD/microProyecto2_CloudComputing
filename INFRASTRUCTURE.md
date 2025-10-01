@@ -326,7 +326,7 @@ az acr repository show --name "microstoreacra9545ff1" --repository "microstore-u
 ```
 
 
-### 📝 PASO 6: Actualizar Manifiestos con ACR Real
+### 📝 PASO 6: Actualizar Manifiestos con ACR Real - HAZLO EN EL CLONE LOCAL DEL AZURE CLI
 
 #### **🎯 Tu comando específico basado en tu ejecución exitosa:**
 ```powershell
@@ -334,7 +334,7 @@ az acr repository show --name "microstoreacra9545ff1" --repository "microstore-u
 # el script te dice "Reemplaza placeholders en los archivos YAML con: microstoreacra9545ff1.azurecr.io"
 #Eso haremos con el siguiente comando para powershell
 
-# Comando exacto para tu ACR Reemplazalo por el obtenido con el comando anterior:
+# Comando exacto para tu ACR Reemplazalo por el obtenido en el script(te lo da al final,sino puede usar denuevo el comando del paso 5 ):
 (Get-ChildItem k8s -Recurse -Filter '*.yaml').FullName | ForEach-Object { (Get-Content $_) -replace '<TU_REGISTRY>', 'microstoreacra9545ff1.azurecr.io' | Set-Content $_ }
 ```
 
@@ -347,6 +347,31 @@ find k8s -name '*.yaml' -exec sed -i "s|<TU_REGISTRY>|microstoreacra9545ff1.azur
 ### 🚀 PASO 7: Desplegar la Aplicación (DETALLADO)
 
 ```bash
+#Si cambaiste a Azure Cloud CLI luego del paso 5 de Dockerizacion es recomendable correr denuevo
+# 7.0 Exportamos los ID's para que terraform sepa donde operar
+export ARM_SUBSCRIPTION_ID="1234abcd-...."   # tu subscription ID real
+export ARM_TENANT_ID="abcd5678-...."         # tu tenant ID real
+# En Cloud Shell:
+cd infra/terraform
+terraform init
+
+# Terraform puede "redescubrir" tu infraestructura existente
+terraform refresh
+terraform show
+
+#Despues de cerrar Minikube termina la sesion que estaba al inicio,para reponerla usamos:
+# 1. Obtener credenciales del cluster AKS
+az aks get-credentials --resource-group rg-microstore-dev --name aks-microstore-cluster --overwrite-existing
+
+# 2. Verificar que kubectl está configurado correctamente
+kubectl cluster-info
+
+# 3. Verificar nodos del cluster
+kubectl get nodes
+
+# 4. Probar de nuevo la validación
+kubectl apply --dry-run=client -f k8s/common/configmap.yaml
+
 # 7.1 Ejecutar validación local (recomendado)
 chmod +x scripts/validate-local.sh
 ./scripts/validate-local.sh
