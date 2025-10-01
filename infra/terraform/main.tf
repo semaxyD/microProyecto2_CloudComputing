@@ -12,13 +12,15 @@ terraform {
   }
 }
 
+data "azurerm_client_config" "current" {}
+
 provider "azurerm" {
-  features {
-    resource_group {
-      prevent_deletion_if_contains_resources = false
-    }
-  }
+  subscription_id = data.azurerm_client_config.current.subscription_id
+  tenant_id       = data.azurerm_client_config.current.tenant_id
+
+  features {}
 }
+
 
 resource "random_id" "suffix" {
   byte_length = 4
