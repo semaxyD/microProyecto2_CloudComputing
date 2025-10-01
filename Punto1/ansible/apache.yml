@@ -1,0 +1,28 @@
+---
+- name: Configurar Apache en web-node
+  hosts: web
+  become: true
+  tasks:
+    - name: Actualizar cache APT
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Instalar Apache
+      ansible.builtin.apt:
+        name: apache2
+        state: present
+
+    - name: Asegurar que Apache está habilitado y en ejecución
+      ansible.builtin.service:
+        name: apache2
+        state: started
+        enabled: yes
+
+    - name: Página de bienvenida personalizada
+      ansible.builtin.template:
+        src: templates/index.html.j2
+        dest: /var/www/html/index.html
+        owner: www-data
+        group: www-data
+        mode: '0644'

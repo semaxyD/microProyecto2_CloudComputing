@@ -1,0 +1,45 @@
+# Vagrantfile
+Vagrant.configure("2") do |config|
+  config.vm.box_check_update = false
+
+  # ---------- CONTROL NODE ----------
+  config.vm.define "control-node" do |cn|
+    cn.vm.box = "bento/ubuntu-22.04"
+    cn.vm.hostname = "control-node"
+    cn.vm.network "private_network", ip: "192.168.56.10" # red privada
+    cn.vm.provider "virtualbox" do |vb|
+      vb.memory = 2048
+      vb.cpus   = 2
+    end
+
+    # Instalar Terraform y Ansible dentro del control-node
+    cn.vm.provision "shell", inline: <<-SHELL
+      set -eux
+      sudo apt-get update -y
+      sudo apt-get install -y software-properties-common gnupg curl
+
+      # Terraform vía repo de HashiCorp
+      curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+      echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg arch=$(dpkg --print-architecture)] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+      sudo apt-get update -y && sudo apt-get install -y terraform
+
+      # Ansible (PPA oficial)
+      sudo apt-add-repository -y ppa:ansible/ansible
+      sudo apt-get update -y && sudo apt-get install -y ansible
+
+      terraform -version
+      ansible --version
+    SHELL
+  end
+
+  # ---------- WEB NODE ----------
+  config.vm.define "web-node" do |web|
+    web.vm.box = "bento/ubuntu-22.04"
+    web.vm.hostname = "web-node"
+    web.vm.network "private_network", ip: "192.168.56.11"
+    web.vm.provider "virtualbox" do |vb|
+      vb.memory = 1024
+      vb.cpus   = 1
+    end
+  end
+end
