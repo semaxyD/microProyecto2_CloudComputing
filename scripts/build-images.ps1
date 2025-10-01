@@ -228,7 +228,7 @@ if ($failedServices.Count -eq 0) {
     Write-Host "   Reemplaza placeholders en los archivos YAML con: $acrLoginServer" -ForegroundColor Yellow
     Write-Host ""
     Write-Host "   Comando sugerido (PowerShell):" -ForegroundColor Cyan
-    Write-Host "   (Get-ChildItem k8s -Recurse -Filter '*.yaml').FullName | ForEach-Object { (Get-Content `$_) -replace '`<TU_REGISTRY`>', '$acrLoginServer' | Set-Content `$_ }" -ForegroundColor White
+    Write-Host "   (Get-ChildItem k8s -Recurse -Filter '*.yaml').FullName | ForEach-Object { (Get-Content `$_) -replace '<TU_REGISTRY>', '$acrLoginServer' | Set-Content `$_ }" -ForegroundColor White
     
 } else {
     Write-Host "❌ Falló el build de los siguientes servicios:" -ForegroundColor Red
