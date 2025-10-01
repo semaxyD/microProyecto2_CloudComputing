@@ -3,42 +3,136 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mini Store</title>
+  <title>Mini Store - Login</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
     body {
-      padding-top: 50px;
-      padding-bottom: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-    .navbar {
+    .login-container {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      max-width: 400px;
+      width: 100%;
+    }
+    .login-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .login-header h1 {
+      color: #333;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .login-header p {
+      color: #666;
+      font-size: 16px;
+    }
+    .store-icon {
+      font-size: 3rem;
+      color: #667eea;
       margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 25px;
+    }
+    .form-control {
+      border: none;
+      border-bottom: 2px solid #ddd;
+      border-radius: 0;
+      padding: 15px 5px;
+      background: transparent;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+    .form-control:focus {
+      border-bottom-color: #667eea;
+      box-shadow: none;
+      background: transparent;
+    }
+    .form-label {
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 5px;
+    }
+    .login-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 50px;
+      padding: 15px 40px;
+      font-weight: 600;
+      font-size: 16px;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      width: 100%;
+      text-transform: uppercase;
+    }
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    .input-icon {
+      position: relative;
+    }
+    .input-icon i {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #999;
     }
   </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-</nav>
-
-<div class="container mt-5">
-  <h2>Login</h2>
-  <form id="login-form">
-    <div class="form-group">
-      <label for="username">Username</label>
-      <input type="text" class="form-control" id="username" required>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="login-container">
+        <div class="login-header">
+          <i class="fas fa-store store-icon"></i>
+          <h1>Mini Store</h1>
+          <p>Ingresa para gestionar tu tienda</p>
+        </div>
+        
+        <form id="login-form">
+          <div class="form-group">
+            <label for="username" class="form-label">Usuario</label>
+            <div class="input-icon">
+              <input type="text" class="form-control" id="username" required placeholder="Ingresa tu usuario">
+              <i class="fas fa-user"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="password" class="form-label">Contraseña</label>
+            <div class="input-icon">
+              <input type="password" class="form-control" id="password" required placeholder="Ingresa tu contraseña">
+              <i class="fas fa-lock"></i>
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary login-btn" onclick="handleLogin()">
+            <i class="fas fa-sign-in-alt me-2"></i> Iniciar Sesión
+          </button>
+        </form>
+      </div>
     </div>
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input type="password" class="form-control" id="password" required>
-    </div>
-    <button type="button" onclick="handleLogin()">Login</button>
-  </form>
+  </div>
 </div>
 
+<!-- Script para pasar variables del backend al frontend -->
+<script>
+    // Variables de servicio pasadas desde el backend
+    const USERS_SERVICE_URL = '{{ users_service_url }}';
+</script>
 <script src="static/scriptUsers.js"></script>
 </body>
 </html>

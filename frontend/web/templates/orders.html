@@ -3,85 +3,427 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Management</title>
+    <title>Gestión de Órdenes - Mini Store</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
-            padding-top: 50px;
-            padding-bottom: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
         }
+        
         .navbar {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        
+        .main-content {
+            padding-top: 100px;
+            padding-bottom: 50px;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .page-subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .content-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: none;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            color: #4facfe;
+        }
+        
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #4facfe;
+            box-shadow: 0 0 0 0.2rem rgba(79, 172, 254, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(86, 171, 47, 0.4);
+        }
+        
+        .table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .table thead th {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-weight: 600;
+        }
+        
+        .table tbody td {
+            padding: 15px;
+            border: none;
+            border-bottom: 1px solid #f8f9fa;
+            vertical-align: middle;
+        }
+        
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .products-table {
+            margin-top: 20px;
             margin-bottom: 20px;
         }
-        .form-container {
-            max-width: 500px;
-            margin: 0 auto;
+        
+        .products-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
         }
-        .order-list {
-            margin-top: 20px;
-            list-style-type: none;
+        
+        .action-buttons {
+            text-align: center;
+            margin-top: 30px;
         }
-        .order-item a {
-            margin-right: 10px;
+        
+        .back-btn {
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            color: #4facfe;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .back-btn:hover {
+            background: white;
+            color: #4facfe;
+            text-decoration: none;
+            transform: translateX(-5px);
+        }
+        
+        .order-id {
+            font-weight: 700;
+            color: #4facfe;
+        }
+        
+        .total-amount {
+            font-weight: 700;
+            color: #28a745;
+            font-size: 1.1rem;
+        }
+        
+        .form-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .product-row-container {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 2px solid #e9ecef;
         }
     </style>
-    </head>
+</head>
 <body>
 
-<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-    <a class="navbar-brand" href="/dashboard">Store Management</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+<nav class="navbar navbar-expand-md navbar-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="/dashboard">
+            <i class="fas fa-store"></i> Mini Store
+        </a>
+    </div>
 </nav>
 
-<div class="container">
-    <div class="form-container">
-        <h2>Create Order</h2>
-        <form id="create-order-form">
-            <div class="form-group">
-                <label for="userName">User Name</label>
-                <input type="text" class="form-control" id="userName" required>
-            </div>
-            <div class="form-group">
-                <label for="userEmail">User Email</label>
-                <input type="email" class="form-control" id="userEmail" required>
-            </div>
+<a href="/dashboard" class="btn back-btn">
+    <i class="fas fa-arrow-left me-2"></i>Volver al Dashboard
+</a>
 
-            <h5>Products</h5>
-            <table class="table" id="products-table">
-                <thead>
-                    <tr>
-                        <th>Product Id</th>
-                        <th>Quantity</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-            <button type="button" class="btn btn-secondary" onclick="addProductRow()">Add Product</button>
-            <button type="button" class="btn btn-primary" onclick="createOrder()">Create Order</button>
-        </form>
+<div class="main-content">
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title"><i class="fas fa-shopping-cart"></i> Gestión de Órdenes</h1>
+            <p class="page-subtitle">Administra las órdenes de compra y ventas</p>
+        </div>
+
+        <div class="content-card">
+            <h3 class="section-title">
+                <i class="fas fa-plus-circle"></i>
+                Crear Nueva Orden
+            </h3>
+            <form id="create-order-form">
+                <div class="form-section">
+                    <h5><i class="fas fa-user me-2"></i>Información del Cliente</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="userName" class="font-weight-bold">Nombre del Cliente</label>
+                                <input type="text" class="form-control" id="userName" required placeholder="Nombre completo del cliente">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="userEmail" class="font-weight-bold">Correo Electrónico</label>
+                                <input type="email" class="form-control" id="userEmail" required placeholder="cliente@correo.com">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h5><i class="fas fa-box me-2"></i>Productos de la Orden</h5>
+                    <div class="table-responsive">
+                        <table class="table products-table" id="products-table">
+                            <thead>
+                                <tr>
+                                    <th>ID del Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="text-center mb-3">
+                        <button type="button" class="btn btn-secondary" onclick="addProductRow()">
+                            <i class="fas fa-plus me-2"></i>Agregar Producto
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <button type="button" class="btn btn-primary btn-lg" onclick="createOrder()">
+                        <i class="fas fa-check me-2"></i>Crear Orden
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="content-card">
+            <h3 class="section-title">
+                <i class="fas fa-list"></i>
+                Historial de Órdenes
+            </h3>
+            <div class="table-responsive">
+                <table id="order-list" class="table">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag me-2"></i>ID</th>
+                            <th><i class="fas fa-user me-2"></i>Cliente</th>
+                            <th><i class="fas fa-envelope me-2"></i>Email</th>
+                            <th><i class="fas fa-dollar-sign me-2"></i>Total</th>
+                            <th><i class="fas fa-calendar me-2"></i>Fecha</th>
+                            <th><i class="fas fa-cogs me-2"></i>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            
+            <div class="action-buttons">
+                <button type="button" class="btn btn-success" onclick="getOrders()">
+                    <i class="fas fa-sync-alt me-2"></i>Actualizar Lista
+                </button>
+            </div>
+        </div>
     </div>
-
-    <h2>Orders List</h2>
-    <table id="order-list" class="table table-striped">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>User Name</th>
-                <th>User Email</th>
-                <th>Total</th>
-                <th>Date</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-    <button type="button" onclick="getOrders()">Get Orders</button>
 </div>
 
+<!-- Script para pasar variables del backend al frontend -->
+<script>
+    // Variables de servicio pasadas desde el backend
+    const ORDERS_SERVICE_URL = '{{ orders_service_url }}';
+    const USERS_SERVICE_URL = '{{ users_service_url }}';
+    const PRODUCTS_SERVICE_URL = '{{ products_service_url }}';
+</script>
 <script src="static/scriptOrders.js"></script>
+
+<script>
+// Mejorar la función addProductRow para que se vea mejor
+function addProductRow() {
+  var tbody = document.querySelector('#products-table tbody');
+  var row = document.createElement('tr');
+  row.className = 'product-row';
+
+  var idCell = document.createElement('td');
+  var idInput = document.createElement('input');
+  idInput.type = 'text';
+  idInput.className = 'form-control';
+  idInput.placeholder = 'ID del producto';
+  idCell.appendChild(idInput);
+  row.appendChild(idCell);
+
+  var qtyCell = document.createElement('td');
+  var qtyInput = document.createElement('input');
+  qtyInput.type = 'number';
+  qtyInput.min = '1';
+  qtyInput.value = '1';
+  qtyInput.className = 'form-control';
+  qtyInput.placeholder = 'Cantidad';
+  qtyCell.appendChild(qtyInput);
+  row.appendChild(qtyCell);
+
+  var actionCell = document.createElement('td');
+  var delBtn = document.createElement('button');
+  delBtn.type = 'button';
+  delBtn.className = 'btn btn-danger btn-sm';
+  delBtn.innerHTML = '<i class="fas fa-trash me-1"></i>Eliminar';
+  delBtn.addEventListener('click', function () {
+    row.remove();
+  });
+  actionCell.appendChild(delBtn);
+  row.appendChild(actionCell);
+
+  tbody.appendChild(row);
+}
+
+// Mejorar la renderización de la lista de órdenes
+function getOrders() {
+  fetch(`${ORDERS_SERVICE_URL}/api/orders`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'include'
+  })
+    .then(response => response.json())
+    .then(data => {
+      var tbody = document.querySelector('#order-list tbody');
+      tbody.innerHTML = '';
+      data.forEach(order => {
+        var row = document.createElement('tr');
+
+        var idCell = document.createElement('td');
+        idCell.innerHTML = `<span class="order-id">#${order.id}</span>`;
+        row.appendChild(idCell);
+
+        var userNameCell = document.createElement('td');
+        userNameCell.innerHTML = `<strong>${order.userName}</strong>`;
+        row.appendChild(userNameCell);
+
+        var userEmailCell = document.createElement('td');
+        userEmailCell.textContent = order.userEmail;
+        userEmailCell.style.color = '#666';
+        row.appendChild(userEmailCell);
+
+        var totalCell = document.createElement('td');
+        totalCell.innerHTML = `<span class="total-amount">$${order.saleTotal}</span>`;
+        row.appendChild(totalCell);
+
+        var dateCell = document.createElement('td');
+        dateCell.textContent = order.date || 'N/A';
+        dateCell.style.color = '#666';
+        row.appendChild(dateCell);
+
+        var actionsCell = document.createElement('td');
+        var editLink = document.createElement('a');
+        editLink.href = `/editOrder/${order.id}`;
+        editLink.innerHTML = '<i class="fas fa-eye me-1"></i>Ver Detalles';
+        editLink.className = 'btn btn-sm btn-primary';
+        actionsCell.appendChild(editLink);
+        row.appendChild(actionsCell);
+
+        tbody.appendChild(row);
+      });
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
 </body>
 </html>
 

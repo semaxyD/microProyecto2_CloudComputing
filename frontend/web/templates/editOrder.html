@@ -24,13 +24,17 @@
         </div>
     </div>
 </div>
-
+<script>
+    // Variables de servicio pasadas desde el backend
+    const ORDERS_SERVICE_URL = '{{ orders_service_url }}';
+    const PRODUCTS_SERVICE_URL = '{{ products_service_url }}';
+</script>
 <script>
 
     // Función para obtener información de un producto desde el microservicio de productos
     async function getProductInfo(productId) {
         try {
-            const response = await fetch(`http://192.168.80.3:5003/api/products/${productId}`);
+            const response = await fetch(`${PRODUCTS_SERVICE_URL}/api/products/${productId}`);
             if (!response.ok) {
                 throw new Error(`Error al obtener producto ${productId}`);
             }
@@ -61,7 +65,7 @@
     // Mostrar indicador de carga
     document.getElementById('order-products').innerHTML = '<li class="list-group-item">Cargando productos...</li>';
 
-    fetch(`http://192.168.80.3:5004/api/orders/${orderId}`)
+    fetch(`${ORDERS_SERVICE_URL}/api/orders/${orderId}`)
       .then(r => r.json())
       .then(async data => {
         document.getElementById('order-id').textContent = data.id

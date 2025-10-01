@@ -1,3 +1,4 @@
+version: "3.8"
 services:
   mysql:
     image: mysql:8.0
@@ -13,24 +14,6 @@ services:
     networks:
       - app-net
 
-  consul-server:
-    image: consul:1.15
-    container_name: consul-server
-    command: "agent -server -bootstrap -ui -client=0.0.0.0"
-    ports:
-      - "8500:8500"
-    networks:
-      - app-net
-
-  consul-client:
-    image: consul:1.15
-    container_name: consul-client
-    command: "agent -retry-join=consul-server -client=0.0.0.0 -config-dir=/consul/config"
-    depends_on:
-      - consul-server
-    networks:
-      - app-net
-
   users:
     build: ./microUsers
     container_name: users
@@ -40,12 +23,13 @@ services:
       - ./microUsers:/app
     depends_on:
       - mysql
-      - consul-client
-      - consul-server
     environment:
-      CONSUL_HOST: consul-server
-      CONSUL_PORT: "8500"
-      CONSUL_SCHEME: http
+      # quitar variables CONSUL_*
+      # aquí pon las variables de conexión a la base de datos u otras que uses
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_USER: root
+      DB_PASS: root
     restart: unless-stopped
     networks:
       - app-net
@@ -59,12 +43,11 @@ services:
       - ./microProducts:/app
     depends_on:
       - mysql
-      - consul-client
-      - consul-server
     environment:
-      CONSUL_HOST: consul-server
-      CONSUL_PORT: "8500"
-      CONSUL_SCHEME: http
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_USER: root
+      DB_PASS: root
     restart: unless-stopped
     networks:
       - app-net
@@ -78,12 +61,11 @@ services:
       - ./microOrders:/app
     depends_on:
       - mysql
-      - consul-client
-      - consul-server
     environment:
-      CONSUL_HOST: consul-server
-      CONSUL_PORT: "8500"
-      CONSUL_SCHEME: http
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_USER: root
+      DB_PASS: root
     restart: unless-stopped
     networks:
       - app-net
@@ -96,16 +78,15 @@ services:
     volumes:
       - ./frontend:/app
     depends_on:
-      - mysql
       - users
       - products
       - orders
-      - consul-client
-      - consul-server
+      - mysql
     environment:
-      CONSUL_HOST: consul-server
-      CONSUL_PORT: "8500"
-      CONSUL_SCHEME: http
+      # Si frontend necesita llamar a microservicios:
+      USERS_URL: http://users:5002
+      PRODUCTS_URL: http://products:5003
+      ORDERS_URL: http://orders:5004
     restart: unless-stopped
     networks:
       - app-net

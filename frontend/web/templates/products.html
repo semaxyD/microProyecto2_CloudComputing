@@ -3,91 +3,414 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Management</title>
+    <title>Gestión de Productos - Mini Store</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
-            padding-top: 50px;
-            padding-bottom: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
         }
+        
         .navbar {
-            margin-bottom: 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
         }
-        .form-container {
-            max-width: 500px;
-            margin: 0 auto;
+        
+        .main-content {
+            padding-top: 100px;
+            padding-bottom: 50px;
         }
-        .product-list {
-            margin-top: 20px;
-            list-style-type: none;
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
         }
-        .product-item {
-            padding: 10px;
+        
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #333;
             margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
         }
-        .product-item a {
+        
+        .page-subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .content-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: none;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
             margin-right: 10px;
+            color: #f5576c;
+        }
+        
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #f5576c;
+            box-shadow: 0 0 0 0.2rem rgba(245, 87, 108, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(252, 182, 159, 0.4);
+            color: #333;
+        }
+        
+        .table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .table thead th {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-weight: 600;
+        }
+        
+        .table tbody td {
+            padding: 15px;
+            border: none;
+            border-bottom: 1px solid #f8f9fa;
+            vertical-align: middle;
+        }
+        
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .quantity-input {
+            width: 80px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 8px;
+        }
+        
+        .quantity-input:focus {
+            border-color: #f5576c;
+            outline: none;
+        }
+        
+        .action-buttons {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .back-btn {
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            color: #f5576c;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .back-btn:hover {
+            background: white;
+            color: #f5576c;
+            text-decoration: none;
+            transform: translateX(-5px);
+        }
+        
+        .price-display {
+            font-weight: 600;
+            color: #28a745;
+            font-size: 1.1rem;
+        }
+        
+        .stock-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .stock-high {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .stock-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .stock-low {
+            background: #f8d7da;
+            color: #721c24;
         }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-    <a class="navbar-brand" href="/dashboard">Store Management</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+<nav class="navbar navbar-expand-md navbar-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="/dashboard">
+            <i class="fas fa-store"></i> Mini Store
+        </a>
+    </div>
 </nav>
 
-<div class="container">
-    <div class="form-container">
-        <h2>Add New Product</h2>
-        <form id="add-product-form">
-           <!-- <div class="form-group">
-                <label for="name">Id</label>
-                <input type="text" class="form-control" id="name" required>
-            </div> -->
-            <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" class="form-control" id="name" required>
-            </div>
-            <div class="form-group">
-                <label for="description">Description</label>
-                <input type="text" class="form-control" id="description" required>
-            </div>
-            <div class="form-group">
-                <label for="price">Price</label>
-                <input type="number" class="form-control" id="price" required>
-            </div>
-            <div class="form-group">
-                <label for="stock">Stock</label>
-                <input type="number" class="form-control" id="stock" required>
-            </div>
-            <button type="button" class="btn btn-primary" onclick="createProduct()">Create Product</button>
-        </form>
-    </div>
+<a href="/dashboard" class="btn back-btn">
+    <i class="fas fa-arrow-left me-2"></i>Volver al Dashboard
+</a>
 
-    <h2>Products List</h2>
-    <table id="product-list" class="table table-striped">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Available Quantity</th>
-                <th>Order Quantity</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-    <button type="button" onclick="getProducts()">Get Products</button>
-    <button type="button" onclick="orderProducts()">Order Products</button>
+<div class="main-content">
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title"><i class="fas fa-box"></i> Gestión de Productos</h1>
+            <p class="page-subtitle">Administra tu inventario y catálogo de productos</p>
+        </div>
+
+        <div class="content-card">
+            <h3 class="section-title">
+                <i class="fas fa-plus-circle"></i>
+                Agregar Nuevo Producto
+            </h3>
+            <form id="add-product-form">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="name" class="font-weight-bold">Nombre del Producto</label>
+                            <input type="text" class="form-control" id="name" required placeholder="Ingresa el nombre del producto">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="price" class="font-weight-bold">Precio ($)</label>
+                            <input type="number" class="form-control" id="price" required placeholder="0.00" step="0.01" min="0">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="stock" class="font-weight-bold">Stock Disponible</label>
+                            <input type="number" class="form-control" id="stock" required placeholder="0" min="0">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="description" class="font-weight-bold">Descripción</label>
+                            <input type="text" class="form-control" id="description" required placeholder="Descripción del producto">
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button type="button" class="btn btn-primary" onclick="createProduct()">
+                        <i class="fas fa-plus-circle me-2"></i>Crear Producto
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="content-card">
+            <h3 class="section-title">
+                <i class="fas fa-list"></i>
+                Catálogo de Productos
+            </h3>
+            <div class="table-responsive">
+                <table id="product-list" class="table">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag me-2"></i>ID</th>
+                            <th><i class="fas fa-tag me-2"></i>Nombre</th>
+                            <th><i class="fas fa-info-circle me-2"></i>Descripción</th>
+                            <th><i class="fas fa-dollar-sign me-2"></i>Precio</th>
+                            <th><i class="fas fa-boxes me-2"></i>Stock</th>
+                            <th><i class="fas fa-shopping-cart me-2"></i>Ordenar</th>
+                            <th><i class="fas fa-cogs me-2"></i>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            
+            <div class="action-buttons">
+                <button type="button" class="btn btn-success me-3" onclick="getProducts()">
+                    <i class="fas fa-sync-alt me-2"></i>Actualizar Lista
+                </button>
+                <button type="button" class="btn btn-warning" onclick="orderProducts()">
+                    <i class="fas fa-shopping-cart me-2"></i>Procesar Órdenes
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
+<!-- Script para pasar variables del backend al frontend -->
+<script>
+    // Variables de servicio pasadas desde el backend
+    const PRODUCTS_SERVICE_URL = '{{ products_service_url }}';
+    const ORDERS_SERVICE_URL = '{{ orders_service_url }}';
+</script>
 <script src="static/scriptProducts.js"></script>
+
+<script>
+// Mejorar la renderización de la tabla de productos
+function getProducts() {
+    fetch(`${PRODUCTS_SERVICE_URL}/api/products`, {
+     method: 'GET',
+     headers: {
+        'Content-Type': 'application/json'
+        },
+     credentials: 'include'
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            var productListBody = document.querySelector('#product-list tbody');
+            productListBody.innerHTML = '';
+
+            data.forEach(product => {
+                var row = document.createElement('tr');
+
+                // ID
+                var idCell = document.createElement('td');
+                idCell.textContent = product.id;
+                idCell.style.fontWeight = '600';
+                row.appendChild(idCell);
+
+                // Name
+                var nameCell = document.createElement('td');
+                nameCell.textContent = product.name;
+                nameCell.style.fontWeight = '600';
+                row.appendChild(nameCell);
+
+                // Description
+                var descCell = document.createElement('td');
+                descCell.textContent = product.description;
+                descCell.style.color = '#666';
+                row.appendChild(descCell);
+
+                // Price
+                var priceCell = document.createElement('td');
+                priceCell.innerHTML = `<span class="price-display">$${product.price}</span>`;
+                row.appendChild(priceCell);
+
+                // Stock with color coding
+                var stockCell = document.createElement('td');
+                var stockBadge = document.createElement('span');
+                stockBadge.textContent = product.stock;
+                stockBadge.className = 'stock-badge ';
+                if (product.stock > 20) {
+                    stockBadge.className += 'stock-high';
+                } else if (product.stock > 5) {
+                    stockBadge.className += 'stock-medium';
+                } else {
+                    stockBadge.className += 'stock-low';
+                }
+                stockCell.appendChild(stockBadge);
+                row.appendChild(stockCell);
+
+                // Order input
+                var orderCell = document.createElement('td');
+                var orderInput = document.createElement('input');
+                orderInput.type = 'text';
+                orderInput.value = "0";
+                orderInput.className = 'quantity-input';
+                orderCell.appendChild(orderInput);
+                row.appendChild(orderCell);
+
+                // Actions
+                var actionsCell = document.createElement('td');
+                
+                var editLink = document.createElement('a');
+                editLink.href = `/editProduct/${product.id}`;
+                editLink.innerHTML = '<i class="fas fa-edit me-1"></i>Editar';
+                editLink.className = 'btn btn-sm btn-primary me-2';
+                actionsCell.appendChild(editLink);
+
+                var deleteLink = document.createElement('a');
+                deleteLink.href = '#';
+                deleteLink.innerHTML = '<i class="fas fa-trash me-1"></i>Eliminar';
+                deleteLink.className = 'btn btn-sm btn-danger';
+                deleteLink.addEventListener('click', function() {
+                    if(confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+                        deleteProduct(product.id);
+                    }
+                });
+                actionsCell.appendChild(deleteLink);
+
+                row.appendChild(actionsCell);
+                productListBody.appendChild(row);
+            });
+        })
+        .catch(error => console.error('Error:', error));
+}
+</script>
 </body>
 </html>
 

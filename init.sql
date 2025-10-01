@@ -44,11 +44,8 @@ INSERT INTO products (name, price, description, stock) VALUES
     ('tablet', 200, 'Tablet 10 pulgadas', 15),
     ('monitor', 80, 'Monitor LED', 25),
     ('mouse', 20, 'Mouse óptico', 50),
-    ('keyboard', 30, 'Teclado mecánico', 40);
-INSERT INTO products (name, price, description, stock) VALUES
-    ('pc', 150, 'Computadora de escritorio', 10),
-    ('phone', 100, 'Teléfono móvil', 20),
-    ('tablet', 200, 'Tablet 10 pulgadas', 15),
-    ('monitor', 80, 'Monitor LED', 25),
-    ('mouse', 20, 'Mouse óptico', 50),
-    ('keyboard', 30, 'Teclado mecánico', 40);
+    ('keyboard', 30, 'Teclado mecánico', 40),
+    ('headphones', 60, 'Auriculares gaming', 30),
+    ('webcam', 45, 'Cámara web HD', 35),
+    ('speakers', 75, 'Altavoces estéreo', 20),
+    ('laptop', 800, 'Laptop 15 pulgadas', 8);

@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  namespace: microstore
+  labels:
+    app: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: <TU_REGISTRY>/frontend:latest
+          ports:
+            - containerPort: 5001
+          env:
+            - name: FLASK_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: FLASK_ENV
+            - name: USERS_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: USERS_SERVICE_HOST
+            - name: PRODUCTS_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: PRODUCTS_SERVICE_HOST
+            - name: ORDERS_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: ORDERS_SERVICE_HOST
+            - name: USERS_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: USERS_SERVICE_PORT
+            - name: PRODUCTS_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: PRODUCTS_SERVICE_PORT
+            - name: ORDERS_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: ORDERS_SERVICE_PORT
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5001
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5001
+            initialDelaySeconds: 60
+            periodSeconds: 30

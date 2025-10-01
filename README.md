@@ -1,399 +1,430 @@
-# Microproyecto #1 - Arquitectura de Microservicios
+# 🚀 MicroStore - Despliegue en Azure Kubernetes Service (AKS)
 
-Este proyecto implementa una arquitectura de microservicios utilizando **Consul** para el descubrimiento de servicios, **Docker** para la contenerización y un **frontend web** para la interacción con los usuarios.
+**Proyecto 2 - Cloud Computing**  
+*Implementación de arquitectura de microservicios en Azure Kubernetes Service usando Terraform*
+
+## 📋 Descripción del Proyecto
+
+Este proyecto implementa una **arquitectura de microservicios completa** desplegada en **Azure Kubernetes Service (AKS)** utilizando **Terraform** para la infraestructura como código. La aplicación MicroStore incluye gestión de usuarios, productos y órdenes con un frontend web moderno.
+
+### 🎯 Objetivos del Proyecto
+- ✅ **Cluster AKS**: Implementación de cluster Kubernetes en Azure con al menos 2 nodos
+- ✅ **Aplicación de Interés**: Despliegue de aplicación MicroStore en AKS  
+- ✅ **Supervisión**: Uso de servicios de monitoreo de Azure (Container Insights)
+- ✅ **Terraform + AKS**: Automatización completa con Infrastructure as Code
 
 ## 🏗️ Arquitectura del Sistema
 
-El proyecto consta de los siguientes microservicios:
+### Microservicios Implementados
+- **👥 microUsers** (Puerto 5002): Gestión de usuarios y autenticación
+- **📦 microProducts** (Puerto 5003): Catálogo y gestión de productos  
+- **📋 microOrders** (Puerto 5004): Procesamiento de órdenes de compra
+- **🌐 frontend** (Puerto 5001): Interfaz web administrativa moderna
+- **🗄️ MySQL 8.0**: Base de datos persistente con StatefulSet
 
-- **microUsers**: Gestión de usuarios
-- **microProducts**: Gestión de productos
-- **microOrders**: Gestión de órdenes (nueva implementación)
-- **frontend**: Interfaz web para la administración
-- **Consul**: Descubrimiento y registro de servicios
+### Infraestructura Azure
+- **☸️ AKS Cluster**: 2 nodos Standard_B2s con auto-scaling (1-5 nodos)
+- **📦 Azure Container Registry (ACR)**: Registro privado de imágenes Docker
+- **📊 Log Analytics Workspace**: Monitoreo y observabilidad  
+- **🚪 NGINX Ingress Controller**: Balanceador de carga y routing
+- **💾 Azure Disk**: Almacenamiento persistente para MySQL
+
+```
+🌐 Internet
+    ↓
+🚪 NGINX Ingress Controller (IP pública)
+    ↓  
+☸️  AKS Cluster (2-5 nodos)
+    ├── 🌐 Frontend (Flask) → 5001
+    ├── 👥 Users Service → 5002  
+    ├── 📦 Products Service → 5003
+    ├── 📋 Orders Service → 5004
+    └── 🗄️ MySQL StatefulSet → 3306
+        └── 💾 Azure Disk (5GB PVC)
+```
 
 ## 📋 Requisitos Previos
 
-- **Vagrant** - Para gestionar la máquina virtual
-- **Docker** y **Docker Compose** - Para la contenerización
-- **VirtualBox** o similar - Hipervisor para Vagrant
-- Conexión a internet para descargar dependencias
+### Herramientas Necesarias
+- **Azure CLI** >= 2.0 - [Instalación](https://docs.microsoft.com/cli/azure/install-azure-cli)
+- **Terraform** >= 1.2 - [Instalación](https://www.terraform.io/downloads.html)
+- **Docker** - Para construir imágenes localmente
+- **kubectl** - Cliente Kubernetes (se instala con Azure CLI)
+- **Cuenta Azure** - Suscripción activa (Azure for Students recomendada)
 
-## 🚀 Instrucciones de Ejecución
-
-### 1. Levantar la Máquina Virtual
-
+### Verificación de Prerrequisitos
 ```bash
-vagrant up
+# Verificar instalaciones
+az --version
+terraform --version  
+docker --version
+kubectl version --client
+
+# Login en Azure
+az login
 ```
 
-### 2. Acceder a la Máquina Virtual
+## 🚀 Guía de Despliegue Completa
+
+### 🔐 1. Configuración Inicial de Azure
 
 ```bash
-vagrant ssh
+# 1. Login en Azure (abre navegador)
+az login
+
+# 2. Listar y seleccionar suscripción
+az account list --output table
+az account set --subscription "TU-SUBSCRIPTION-ID"
+
+# 3. Validar región y recursos disponibles
+REGION="East US"  # Cambiar por tu región preferida
+az vm list-skus --location "$REGION" --query "[?name=='Standard_B2s']" -o table
+az vm list-usage --location "$REGION" --query "[?name.value=='Total Regional vCPUs']" -o table
 ```
 
-### 3. Iniciar los Contenedores
+### 🏗️ 2. Crear Infraestructura con Terraform
 
 ```bash
-cd /vagrant
-docker compose up -d
+# 1. Ir al directorio de Terraform
+cd infra/terraform
+
+# 2. Inicializar Terraform (descargar providers)
+terraform init
+
+# 3. Revisar plan de ejecución
+terraform plan
+
+# 4. Crear infraestructura (10-15 minutos)
+terraform apply
+# Escribir: yes
+
+# 5. Verificar outputs
+terraform output
 ```
 
-### 4. Verificar el Estado de los Servicios
+**Recursos creados:**
+- 🏢 Resource Group: `rg-microstore-dev`
+- ☸️ AKS Cluster: `aks-microstore-cluster`  
+- 📦 Azure Container Registry: `microstoreacr[random]`
+- 📊 Log Analytics Workspace para monitoreo
+- 🔐 Role assignments automáticos entre AKS y ACR
+
+### ⚙️ 3. Configurar Acceso a Kubernetes
 
 ```bash
-docker compose ps
+# 1. Volver a la raíz del proyecto
+cd ../..
+
+# 2. Configurar kubectl automáticamente
+./scripts/setup-k8s.sh
+
+# 3. Verificar conexión
+kubectl cluster-info
+kubectl get nodes
 ```
 
-## 🌐 Acceso a las Aplicaciones
+### 🐳 4. Construir y Subir Imágenes Docker
 
-- **Frontend Web**: [http://192.168.80.3:5001](http://192.168.80.3:5001)
-- **Consul UI**: [http://192.168.80.3:8500](http://192.168.80.3:8500)
+```bash
+# 1. Ejecutar script de build automático
+./scripts/build-images.sh
+
+# El script realiza:
+# - Login automático al ACR
+# - Build de 4 imágenes Docker
+# - Push al Azure Container Registry
+# - Verificación de imágenes subidas
+
+# 2. Verificar imágenes en ACR
+ACR_NAME=$(terraform -chdir=infra/terraform output -raw acr_name)
+az acr repository list --name $ACR_NAME --output table
+```
+
+### 📝 5. Actualizar Manifiestos de Kubernetes
+
+```bash
+# 1. Obtener URL del ACR
+ACR_LOGIN_SERVER=$(terraform -chdir=infra/terraform output -raw acr_login_server)
+
+# 2. Reemplazar placeholders en manifiestos
+find k8s -name '*.yaml' -exec sed -i "s|<TU_REGISTRY>|$ACR_LOGIN_SERVER|g" {} +
+
+# 3. Verificar cambios
+grep -r "azurecr.io" k8s/
+```
+
+### 🚀 6. Desplegar Aplicación
+
+```bash
+# 1. Ejecutar despliegue completo
+./scripts/deploy.sh
+
+# El script despliega en orden:
+# 1. Namespace microstore
+# 2. Secrets y ConfigMaps  
+# 3. MySQL StatefulSet
+# 4. Microservicios (users, products, orders)
+# 5. Frontend web
+# 6. Verificaciones automáticas
+
+# 2. Verificar estado del despliegue
+kubectl get all -n microstore
+```
+
+### 🌐 7. Acceder a la Aplicación
+
+```bash
+# 1. Obtener IP externa del Ingress (puede tardar 2-5 minutos)
+kubectl get svc ingress-nginx-controller -n ingress-nginx
+
+# 2. Cuando aparezca EXTERNAL-IP, acceder a:
+INGRESS_IP=$(kubectl get svc ingress-nginx-controller -n ingress-nginx -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+
+echo "🌐 Frontend: http://$INGRESS_IP/"
+echo "👥 Users API: http://$INGRESS_IP/api/users/"  
+echo "📦 Products API: http://$INGRESS_IP/api/products/"
+echo "📋 Orders API: http://$INGRESS_IP/api/orders/"
+```
+
+## 📊 Supervisión y Monitoreo
+
+### Container Insights en Azure Portal
+1. 🌐 Acceder a [Azure Portal](https://portal.azure.com)
+2. 🔍 Buscar Resource Group: `rg-microstore-dev`
+3. ☸️ Seleccionar cluster AKS: `aks-microstore-cluster`
+4. 📊 Click en **"Insights"** en el menú izquierdo
+5. 📈 Visualizar métricas en tiempo real:
+   - CPU y memoria de nodos
+   - Estado de pods y contenedores
+   - Logs centralizados
+   - Alertas y notificaciones
+
+### Monitoreo desde CLI
+```bash
+# Ver métricas de recursos
+kubectl top nodes
+kubectl top pods -n microstore
+
+# Logs en tiempo real
+kubectl logs -f deployment/frontend -n microstore
+kubectl logs -f deployment/users -n microstore
+
+# Eventos del cluster
+kubectl get events -n microstore --sort-by='.lastTimestamp'
+
+# Estado detallado de pods
+kubectl describe pod <pod-name> -n microstore
+```
+
+## 🧪 Pruebas de Funcionamiento
+
+### Verificación de APIs
+```bash
+# Variables
+INGRESS_IP=$(kubectl get svc ingress-nginx-controller -n ingress-nginx -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+
+# Probar frontend
+curl -I http://$INGRESS_IP/
+
+# Probar APIs de microservicios
+curl http://$INGRESS_IP/api/users/users | jq .
+curl http://$INGRESS_IP/api/products/products | jq .  
+curl http://$INGRESS_IP/api/orders/orders | jq .
+```
+
+### Pruebas de Resiliencia
+```bash
+# Simular falla de un microservicio
+kubectl scale deployment users --replicas=0 -n microstore
+
+# Verificar en frontend (debe mostrar error)
+curl http://$INGRESS_IP/api/users/users
+
+# Restaurar servicio
+kubectl scale deployment users --replicas=2 -n microstore
+
+# Verificar recuperación automática
+kubectl get pods -n microstore --watch
+```
 
 ## 📁 Estructura del Proyecto
 
 ```
-microProyecto1_CloudComputing/
-├── frontend/                    # Interfaz web
-│   ├── web/
-│   │   ├── static/             # Archivos estáticos (JS, CSS)
-│   │   ├── templates/          # Plantillas HTML
-│   │   └── views.py            # Vistas del frontend
-│   ├── Dockerfile
-│   └── requirements.txt
-├── microUsers/                 # Microservicio de usuarios
-│   ├── users/
-│   ├── Dockerfile
-│   └── requirements.txt
-├── microProducts/              # Microservicio de productos
-│   ├── products/
-│   ├── Dockerfile
-│   └── requirements.txt
-├── microOrders/                # Microservicio de órdenes
-│   ├── orders/
-│   ├── Dockerfile
-│   └── requirements.txt
-├── docker-compose.yml          # Configuración de Docker Compose
-├── Vagrantfile                 # Configuración de Vagrant
-└── init.sql                    # Script de inicialización de BD
+📁 microProyecto2_CloudComputing/
+├── 🐳 frontend/                    # Aplicación web Flask con UI moderna
+│   ├── web/templates/             # Plantillas HTML con Bootstrap
+│   ├── web/static/                # CSS, JS, assets
+│   ├── Dockerfile                 # Imagen Docker del frontend
+│   └── requirements.txt           # Dependencias Python
+├── 🔧 microUsers/                 # Microservicio de usuarios
+│   ├── users/controllers/         # Lógica de negocio  
+│   ├── users/models/              # Modelos de datos
+│   └── Dockerfile                 # Imagen Docker
+├── 📦 microProducts/              # Microservicio de productos
+│   ├── products/controllers/      # API REST de productos
+│   ├── products/models/           # Esquemas de BD
+│   └── Dockerfile
+├── 📋 microOrders/                # Microservicio de órdenes
+│   ├── orders/controllers/        # Procesamiento de órdenes
+│   ├── orders/models/             # Modelos de órdenes
+│   └── Dockerfile  
+├── ☸️ k8s/                        # Manifiestos Kubernetes
+│   ├── common/                    # Secrets y ConfigMaps
+│   ├── mysql/                     # Base de datos MySQL
+│   ├── users/                     # Deployment, Service, Ingress
+│   ├── products/                  # Manifiestos de productos
+│   ├── orders/                    # Manifiestos de órdenes
+│   └── frontend/                  # Manifiestos de frontend
+├── 🏗️ infra/terraform/            # Infrastructure as Code
+│   ├── main.tf                    # Recursos principales de Azure
+│   ├── variables.tf               # Variables configurables
+│   └── outputs.tf                 # Outputs del despliegue
+├── 📜 scripts/                    # Scripts de automatización
+│   ├── setup-k8s.sh              # Configurar kubectl
+│   ├── build-images.sh           # Build y push de imágenes
+│   ├── deploy.sh                  # Despliegue completo
+│   ├── cleanup.sh                 # Limpieza de recursos
+│   └── validate-local.sh         # Validación previa
+├── 📖 INFRASTRUCTURE.md           # Guía detallada de despliegue
+├── 🪟 WINDOWS-GUIDE.md            # Guía específica para Windows
+├── init.sql                       # Script de inicialización de BD
+└── README.md                      # Este archivo
 ```
-
-## 🔧 Implementación del Microservicio Orders
-
-### Configuración de la Aplicación y Consul
-
-**Archivo principal**: `microOrders/orders/views.py`
-
-### Frontend - Gestión de Órdenes
-
-- **Vista de órdenes**: `frontend/web/templates/orders.html`
-- **Edición de órdenes**: `frontend/web/templates/editOrder.html`
-- **JavaScript**: `frontend/web/static/scriptOrders.js`
-
-### Dockerfiles
-
-- **Frontend**: `frontend/Dockerfile`
-- **Orders**: `microOrders/Dockerfile`
-
-## 🧪 Pruebas del Sistema
-
-### Verificar Funcionamiento de Consul
-
-1. **Detener el microservicio Orders**:
-   ```bash
-   docker compose stop orders
-   ```
-
-2. **Verificar en Consul UI**:
-   - Accede a [http://192.168.80.3:8500](http://192.168.80.3:8500)
-   - Observa que el servicio `orders` aparece como **parado** (stopped)
-
-3. **Reiniciar el servicio**:
-   ```bash
-   docker compose start orders
-   ```
-
-4. **Verificar recuperación**:
-   - El servicio debería aparecer como **activo** (passing) en Consul
-
-### Verificar Logs de los Servicios
-
-```bash
-# Ver logs de todos los servicios
-docker compose logs
-
-# Ver logs de un servicio específico
-docker compose logs orders
-docker compose logs frontend
-```
-
-## 🔍 Solución de Problemas
-
-### Servicio no disponible
-- Verificar que todos los contenedores estén ejecutándose: `docker compose ps`
-- Revisar logs específicos: `docker compose logs <servicio>`
-
-### Problemas de conectividad
-- Verificar configuración de red en Vagrant
-- Comprobar que los puertos estén libres en el host
-
-### Errores de Consul
-- Reiniciar Consul: `docker compose restart consul`
-- Verificar configuración en los archivos `config.py` de cada microservicio
-
-## 📊 Estado de los Servicios
-
-Los servicios deberían estar disponibles en:
-- **Users API**: Puerto interno del contenedor
-- **Products API**: Puerto interno del contenedor
-- **Orders API**: Puerto interno del contenedor
-- **Frontend**: [http://192.168.80.3:5001](http://192.168.80.3:5001)
-- **Consul**: [http://192.168.80.3:8500](http://192.168.80.3:8500)
 
 ## 🛠️ Comandos Útiles
 
+### Gestión del Cluster
 ```bash
-# Detener todos los servicios
-docker compose down
+# Ver estado general
+kubectl get all -n microstore
 
-# Reconstruir y reiniciar servicios
-docker compose up --build -d
+# Escalar servicios
+kubectl scale deployment users --replicas=3 -n microstore
 
-# Ver logs en tiempo real
-docker compose logs -f
+# Auto-scaling
+kubectl autoscale deployment users --cpu-percent=50 --min=1 --max=10 -n microstore
 
-# Acceder a un contenedor
-docker compose exec <servicio> bash
+# Port forwarding para desarrollo
+kubectl port-forward svc/frontend-service -n microstore 5001:5001
 ```
 
-## 1. Configuración de Dockerfile para la creación de contenedores
+### Debugging y Logs
+```bash
+# Logs de un servicio específico
+kubectl logs -l app=users -n microstore --tail=50
 
-El Dockerfile define cómo se construye la imagen de cada microservicio. Por ejemplo, el Dockerfile de `orders`:
+# Acceder a un pod
+kubectl exec -it deployment/users -n microstore -- /bin/bash
 
-```Dockerfile
-FROM python:3.9-slim
-# Se usa una imagen ligera de Python para reducir el tamaño y mejorar la seguridad.
-WORKDIR /app
-# Define el directorio de trabajo dentro del contenedor.
-RUN apt-get update && apt-get install -y \
-		gcc \
-		default-libmysqlclient-dev \
-		pkg-config \
-		&& rm -rf /var/lib/apt/lists/*
-# Instala dependencias necesarias para conectar con MySQL y compilar paquetes Python.
-COPY requirements.txt .
-# Copia el archivo de dependencias de Python.
-RUN pip install --no-cache-dir -r requirements.txt
-# Instala las dependencias del proyecto.
-COPY . .
-# Copia el resto del código fuente al contenedor.
-EXPOSE 5004
-# Expone el puerto en el que correrá el microservicio.
-CMD ["python", "run.py"]
-# Comando que inicia la aplicación Flask.
+# Verificar configuración
+kubectl describe deployment users -n microstore
+kubectl get configmap -n microstore -o yaml
 ```
 
-**¿Por qué?**
-Esto permite que cada microservicio se ejecute de forma aislada, con sus propias dependencias y configuración, facilitando el despliegue y la escalabilidad.
+### Gestión de Imágenes
+```bash
+# Listar imágenes en ACR
+az acr repository list --name $(terraform -chdir=infra/terraform output -raw acr_name)
 
-## 2. Configuración del descubrimiento con flask_consulate en microservicios
+# Ver tags de una imagen
+az acr repository show-tags --name $ACR_NAME --repository microstore-users
 
-Para que los microservicios se descubran entre sí y sean monitoreados, se usa Consul junto con la extensión flask_consulate. Ejemplo en `views.py` de `microOrders`:
-
-```python
-from flask import Flask, render_template
-from orders.controllers.order_controller import order_controller
-from db.db import db
-from flask_cors import CORS
-from flask_consulate import Consul
-
-app = Flask(__name__)
-CORS(app)
-# Permite peticiones desde otros dominios (CORS), útil para el frontend.
-
-@app.route('/healthcheck')
-def health_check():
-		"""
-		Esta función indica el estado actual al Consul.
-		Formato: https://www.consul.io/docs/agent/checks.html
-		"""
-		return 'OK', 200
-# Endpoint que Consul usa para verificar si el microservicio está vivo.
-
-app.config['CONSUL_HOST'] = 'consul-server'
-app.config['CONSUL_PORT'] = 8500
-# Configura la conexión al servidor Consul.
-
-consul = Consul(app=app)
-# Inicializa la extensión flask_consulate.
-consul.apply_remote_config(namespace='mynamespace/')
-# Aplica configuración remota si existe.
-consul.register_service(
-		name='orders-microservice',
-		interval='10s',
-		tags=['microservice', 'orders'],
-		port=5004,
-		httpcheck='http://orders:5004/healthcheck'
-)
-# Registra el microservicio en Consul para descubrimiento y monitoreo.
-
-app.config.from_object('config.Config')
-db.init_app(app)
-# Inicializa la base de datos.
-app.register_blueprint(order_controller)
-# Registra las rutas del controlador de órdenes.
-
-@app.after_request
-def apply_cors_headers(response):
-		response.headers['Access-Control-Allow-Origin'] = 'http://localhost:5001'
-		response.headers['Access-Control-Allow-Credentials'] = 'true'
-		response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
-		response.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,DELETE,OPTIONS'
-		return response
-# Asegura que las respuestas incluyan los headers necesarios para CORS.
-
-if __name__ == '__main__':
-		app.run()
-# Inicia la aplicación Flask.
+# Limpiar imágenes antiguas
+az acr repository delete --name $ACR_NAME --repository microstore-users --tag latest
 ```
 
-**¿Por qué?**
-Consul permite que los microservicios se registren y sean descubiertos automáticamente, facilitando la comunicación y el monitoreo en arquitecturas distribuidas.
+## 🧹 Limpieza de Recursos
 
-## 3. Configuración del docker-compose.yml
+### ⚠️ IMPORTANTE: Gestión de Costos
+Los recursos de AKS consumen créditos de Azure. **Se recomienda destruir el cluster** después de las pruebas y recrearlo antes de la sustentación.
 
-El archivo `docker-compose.yml` define y orquesta todos los servicios del sistema. Ejemplo:
+### Limpiar Solo la Aplicación
+```bash
+# Mantener infraestructura, eliminar aplicación
+./scripts/cleanup.sh
 
-```yaml
-services:
-	mysql:
-		image: mysql:8.0
-		container_name: mysql
-		restart: always
-		environment:
-			MYSQL_ROOT_PASSWORD: root
-			MYSQL_DATABASE: myflaskapp
-		ports:
-			- "3306:3306"
-		volumes:
-			- ./init.sql:/docker-entrypoint-initdb.d/init.sql
-		networks:
-			- app-net
-# Define la base de datos MySQL y la inicializa con el script init.sql.
-
-	consul-server:
-		image: consul:1.15
-		container_name: consul-server
-		command: "agent -server -bootstrap -ui -client=0.0.0.0"
-		ports:
-			- "8500:8500"
-		networks:
-			- app-net
-# Inicia el servidor Consul con interfaz web y modo bootstrap.
-
-	consul-client:
-		image: consul:1.15
-		container_name: consul-client
-		command: "agent -retry-join=consul-server -client=0.0.0.0 -config-dir=/consul/config"
-		depends_on:
-			- consul-server
-		networks:
-			- app-net
-# Cliente Consul que se une al servidor para registrar servicios.
-
-	users:
-		build: ./microUsers
-		container_name: users
-		ports:
-			- "5002:5002"
-		volumes:
-			- ./microUsers:/app
-		depends_on:
-			- mysql
-			- consul-client
-			- consul-server
-		environment:
-			CONSUL_HOST: consul-server
-			CONSUL_PORT: "8500"
-			CONSUL_SCHEME: http
-		restart: unless-stopped
-		networks:
-			- app-net
-# Microservicio de usuarios, depende de la base de datos y Consul.
-
-	products:
-		build: ./microProducts
-		container_name: products
-		ports:
-			- "5003:5003"
-		volumes:
-			- ./microProducts:/app
-		depends_on:
-			- mysql
-			- consul-client
-			- consul-server
-		environment:
-			CONSUL_HOST: consul-server
-			CONSUL_PORT: "8500"
-			CONSUL_SCHEME: http
-		restart: unless-stopped
-		networks:
-			- app-net
-# Microservicio de productos, depende de la base de datos y Consul.
-
-	orders:
-		build: ./microOrders
-		container_name: orders
-		ports:
-			- "5004:5004"
-		volumes:
-			- ./microOrders:/app
-		depends_on:
-			- mysql
-			- consul-client
-			- consul-server
-		environment:
-			CONSUL_HOST: consul-server
-			CONSUL_PORT: "8500"
-			CONSUL_SCHEME: http
-		restart: unless-stopped
-		networks:
-			- app-net
-# Microservicio de órdenes, depende de la base de datos y Consul.
-
-	frontend:
-		build: ./frontend
-		container_name: frontend
-		ports:
-			- "5001:5001"
-		volumes:
-			- ./frontend:/app
-		depends_on:
-			- mysql
-			- users
-			- products
-			- orders
-			- consul-client
-			- consul-server
-		environment:
-			CONSUL_HOST: consul-server
-			CONSUL_PORT: "8500"
-			CONSUL_SCHEME: http
-		restart: unless-stopped
-		networks:
-			- app-net
-# Frontend web, depende de todos los microservicios y Consul.
-
-networks:
-	app-net:
-		driver: bridge
-# Red interna para que los servicios se comuniquen entre sí.
+# Verificar limpieza
+kubectl get all -n microstore
 ```
 
-**¿Por qué?**
-Docker Compose permite levantar y coordinar todos los servicios con un solo comando, facilitando el desarrollo, pruebas y despliegue.
+### Destruir Toda la Infraestructura
+```bash
+# ⚠️ CUIDADO: Esto elimina TODO
+cd infra/terraform
+terraform destroy
+# Escribir: yes
+
+# Verificar en Azure Portal que todo se eliminó
+az group list --query "[?name=='rg-microstore-dev']" --output table
+```
+
+### Recrear Antes de Sustentación
+```bash
+# Ejecutar toda la secuencia nuevamente
+az login
+cd infra/terraform && terraform apply
+cd ../.. && ./scripts/setup-k8s.sh
+./scripts/build-images.sh
+# Actualizar manifiestos y desplegar...
+```
+
+## 📈 Características Técnicas Implementadas
+
+### ✅ Kubernetes en Azure
+- **AKS Cluster** con 2 nodos mínimo, auto-scaling hasta 5
+- **Node Pools** configurados con Standard_B2s
+- **RBAC** habilitado para seguridad
+- **Container Insights** para monitoreo nativo
+
+### ✅ Aplicación de Microservicios
+- **4 microservicios** independientes en Flask
+- **MySQL 8.0** con persistencia en Azure Disk
+- **NGINX Ingress** para balanceamiento de carga
+- **Secrets y ConfigMaps** para configuración
+
+### ✅ Infrastructure as Code
+- **Terraform** para toda la infraestructura
+- **Azure Container Registry** integrado
+- **Role Assignments** automáticos
+- **Log Analytics** pre-configurado
+
+### ✅ DevOps y Automatización
+- **Scripts bash** para automatización completa
+- **Docker multi-stage builds** optimizados
+- **Health checks** y **readiness probes**
+- **Validación previa** con `validate-local.sh`
+
+## 🎯 Demostración de Objetivos
+
+### 1. ✅ Cluster AKS Implementado
+- **Verificación Portal**: Azure Portal → AKS → Insights
+- **Verificación CLI**: `kubectl get nodes` y `az aks show`
+- **Dos nodos mínimo**: Configurado en `variables.tf`
+
+### 2. ✅ Aplicación Desplegada  
+- **Frontend accesible**: `http://[INGRESS-IP]/`
+- **APIs funcionales**: Endpoints `/api/users/`, `/api/products/`, `/api/orders/`
+- **Base de datos persistente**: MySQL con datos de prueba
+
+### 3. ✅ Supervisión Activa
+- **Container Insights**: Métricas en tiempo real en Azure Portal
+- **Logs centralizados**: `kubectl logs` y Azure Monitor
+- **Alertas configurables**: Disponibles en Azure Portal
+
+### 4. ✅ Terraform + AKS (Opcional)
+- **Infrastructure as Code**: Todo en `infra/terraform/`
+- **Despliegue reproducible**: `terraform apply`
+- **Gestión de estado**: terraform.tfstate
+
+## 🔗 Enlaces de Referencia
+
+- 📖 [Guía oficial AKS](https://learn.microsoft.com/es-es/azure/aks/learn/quick-kubernetes-deploy-portal)
+- 🏗️ [Terraform Azure Provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest)
+- ☸️ [Kubernetes Documentation](https://kubernetes.io/docs/)
+- 📊 [Azure Monitor for Containers](https://docs.microsoft.com/azure/azure-monitor/containers/)
 
 ---
+
+**🎓 Proyecto desarrollado para Cloud Computing - Implementación completa de microservicios en Azure Kubernetes Service**
 
 

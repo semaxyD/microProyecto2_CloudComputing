@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: microstore
+data:
+  # Variables de configuración no sensibles
+  FLASK_ENV: "production"
+  # Rutas base de los servicios para comunicación interna
+  USERS_SERVICE_HOST: "users-service"
+  PRODUCTS_SERVICE_HOST: "products-service"
+  ORDERS_SERVICE_HOST: "orders-service"
+  # Puertos de los servicios (en Kubernetes usamos puerto 80 para simplificar)
+  USERS_SERVICE_PORT: "80"
+  PRODUCTS_SERVICE_PORT: "80"
+  ORDERS_SERVICE_PORT: "80"
+  # Host del frontend para CORS
+  FRONTEND_HOST: "http://frontend-service"
