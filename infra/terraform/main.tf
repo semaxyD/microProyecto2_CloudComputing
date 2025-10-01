@@ -12,12 +12,7 @@ terraform {
   }
 }
 
-data "azurerm_client_config" "current" {}
-
 provider "azurerm" {
-  subscription_id = data.azurerm_client_config.current.subscription_id
-  tenant_id       = data.azurerm_client_config.current.tenant_id
-
   features {}
 }
 
