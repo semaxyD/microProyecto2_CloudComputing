@@ -296,6 +296,17 @@ az acr repository list --name $ACR_NAME --output table              # Ambos
 #### **💡 Ventajas por método:**
 - **☁️ Cloud Shell**: Sin instalaciones locales, perfecto para desarrollo rápido
 - **🪟 PowerShell**: Control total, mejor para debugging, funciona siempre
+
+#### **🔍 Verificar que las imágenes se subieron:**
+```bash
+# 5.4 Verificar imágenes en ACR (ambos métodos)
+# Linux/Cloud Shell:
+ACR_NAME=$(terraform -chdir=infra/terraform output -raw acr_name)
+# PowerShell:
+$acrName = terraform -chdir=infra/terraform output -raw acr_name
+
+# Listar todas las imágenes (ambos):
+az acr repository list --name $ACR_NAME --output table
 # Deberías ver:
 # Result
 # ----------------
@@ -304,34 +315,56 @@ az acr repository list --name $ACR_NAME --output table              # Ambos
 # microstore-orders
 # microstore-frontend
 
-# 5.4 Ver detalles de una imagen específica
+# 5.5 Ver detalles de una imagen específica
 az acr repository show-tags --name $ACR_NAME --repository microstore-users --output table
 # Deberías ver el tag "latest"
 ```
 
 ### 📝 PASO 6: Actualizar Manifiestos con ACR Real
 
+**⚠️ IMPORTANTE**: Los scripts de build automáticamente te dan el comando para hacer este reemplazo
+
+#### **Opción A: Usando el comando que sugiere el script** ⭐ (Recomendada)
+```bash
+# Después de ejecutar build-images.sh o build-images.ps1, 
+# el script te muestra exactamente qué hacer:
+
+# ✅ Para Linux/Cloud Shell:
+find k8s -name '*.yaml' -exec sed -i "s|<TU_REGISTRY>|microstoreacra9545ff1.azurecr.io|g" {} +
+
+# ✅ Para Windows PowerShell:
+(Get-ChildItem k8s -Recurse -Filter '*.yaml').FullName | ForEach-Object { (Get-Content $_) -replace '<TU_REGISTRY>', 'microstoreacra9545ff1.azurecr.io' | Set-Content $_ }
+```
+
+#### **Opción B: Manualmente paso a paso** 🔧
 ```bash
 # 6.1 Obtener la URL completa del ACR
+# Linux/Cloud Shell:
 ACR_LOGIN_SERVER=$(terraform -chdir=infra/terraform output -raw acr_login_server)
+# PowerShell:
+$ACR_LOGIN_SERVER = terraform -chdir=infra/terraform output -raw acr_login_server
+
 echo "Tu ACR es: $ACR_LOGIN_SERVER"
-# Ejemplo: microstoreacr1234abcd.azurecr.io
+# Ejemplo: microstoreacra9545ff1.azurecr.io
 
 # 6.2 Verificar que los manifiestos tienen placeholders
-grep -r "<TU_REGISTRY>" k8s/
+grep -r "<TU_REGISTRY>" k8s/                    # Linux
+Select-String -Path k8s\**\*.yaml "<TU_REGISTRY>"  # PowerShell
 # Deberías ver líneas como:
 # k8s/users/deployment.yaml:        image: <TU_REGISTRY>/microstore-users:latest
 
 # 6.3 Reemplazar placeholders con tu ACR real
+# Linux/Cloud Shell:
 find k8s -name '*.yaml' -exec sed -i "s|<TU_REGISTRY>|$ACR_LOGIN_SERVER|g" {} +
 
-# Para Windows PowerShell (si el comando anterior no funciona):
-# Get-ChildItem -Recurse k8s -Filter "*.yaml" | ForEach-Object { (Get-Content $_.FullName) -replace '<TU_REGISTRY>', $ACR_LOGIN_SERVER | Set-Content $_.FullName }
+# Windows PowerShell:
+(Get-ChildItem k8s -Recurse -Filter "*.yaml").FullName | ForEach-Object { (Get-Content $_) -replace '<TU_REGISTRY>', $ACR_LOGIN_SERVER | Set-Content $_ }
 
 # 6.4 Verificar que se reemplazaron correctamente
-grep -r "azurecr.io" k8s/
+grep -r "azurecr.io" k8s/                                    # Linux
+Select-String -Path k8s\**\*.yaml "azurecr.io"              # PowerShell
 # Ahora deberías ver líneas como:
-# k8s/users/deployment.yaml:        image: microstoreacr1234abcd.azurecr.io/microstore-users:latest
+# k8s/users/deployment.yaml:        image: microstoreacra9545ff1.azurecr.io/microstore-users:latest
 ```
 
 ### 🚀 PASO 7: Desplegar la Aplicación (DETALLADO)

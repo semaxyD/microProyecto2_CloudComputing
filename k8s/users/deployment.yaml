@@ -27,7 +27,7 @@ spec:
               done;
       containers:
         - name: users
-          image: <TU_REGISTRY>/users:latest
+          image: <TU_REGISTRY>/microstore-users:latest
           ports:
             - containerPort: 5002
           env:

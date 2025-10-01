@@ -4,6 +4,8 @@ metadata:
   name: app-config
   namespace: microstore
 data:
+  # Registry URL para las imágenes
+  CONTAINER_REGISTRY: "<TU_REGISTRY>"
   # Variables de configuración no sensibles
   FLASK_ENV: "production"
   # Rutas base de los servicios para comunicación interna

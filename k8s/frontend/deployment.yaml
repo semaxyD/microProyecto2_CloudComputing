@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: <TU_REGISTRY>/frontend:latest
+          image: <TU_REGISTRY>/microstore-frontend:latest
           ports:
             - containerPort: 5001
           env:

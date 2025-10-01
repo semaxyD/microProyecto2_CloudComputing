@@ -27,7 +27,7 @@ spec:
               done;
       containers:
         - name: products
-          image: <TU_REGISTRY>/products:latest
+          image: <TU_REGISTRY>/microstore-products:latest
           ports:
             - containerPort: 5003
           env:

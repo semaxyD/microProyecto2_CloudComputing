@@ -27,7 +27,7 @@ spec:
               done;
       containers:
         - name: orders
-          image: <TU_REGISTRY>/orders:latest
+          image: <TU_REGISTRY>/microstore-orders:latest
           ports:
             - containerPort: 5004
           env:

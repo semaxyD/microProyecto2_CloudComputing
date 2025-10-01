@@ -225,10 +225,10 @@ if ($failedServices.Count -eq 0) {
     
     Write-Host ""
     Write-Host "🚀 Siguiente paso: Actualizar manifiestos de Kubernetes" -ForegroundColor Green
-    Write-Host "   Reemplaza <TU_REGISTRY> en los archivos YAML con: $acrLoginServer" -ForegroundColor Yellow
+    Write-Host "   Reemplaza [TU_REGISTRY] en los archivos YAML con: $acrLoginServer" -ForegroundColor Yellow
     Write-Host ""
     Write-Host "   Comando sugerido (PowerShell):" -ForegroundColor Cyan
-    Write-Host "   (Get-ChildItem k8s -Recurse -Filter '*.yaml').FullName | ForEach-Object { (Get-Content `$_) -replace '<TU_REGISTRY>', '$acrLoginServer' | Set-Content `$_ }" -ForegroundColor White
+    Write-Host "   (Get-ChildItem k8s -Recurse -Filter '*.yaml').FullName | ForEach-Object { (Get-Content `$_) -replace '[TU_REGISTRY]', '$acrLoginServer' | Set-Content `$_ }" -ForegroundColor White
     
 } else {
     Write-Host "❌ Falló el build de los siguientes servicios:" -ForegroundColor Red
@@ -237,11 +237,12 @@ if ($failedServices.Count -eq 0) {
     }
     Write-Host ""
     Write-Host "💡 Consejos para troubleshooting:" -ForegroundColor Yellow
-    Write-Host "   1. Verifica que Docker Desktop esté ejecutándose" -ForegroundColor White
+    Write-Host "   1. Verifica que Docker Desktop este ejecutandose" -ForegroundColor White
     Write-Host "   2. Revisa los Dockerfiles en cada directorio" -ForegroundColor White
-    Write-Host "   3. Verifica conexión a internet para el push" -ForegroundColor White
+    Write-Host "   3. Verifica conexion a internet para el push" -ForegroundColor White
     Write-Host "   4. Comprueba permisos en el ACR" -ForegroundColor White
     exit 1
+}
 }
 
 Write-Host ""
