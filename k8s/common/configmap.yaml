@@ -18,3 +18,5 @@ data:
   ORDERS_SERVICE_PORT: "80"
   # Host del frontend para CORS
   FRONTEND_HOST: "http://frontend-service"
+  # IP externa del Ingress (actualizar según deployment)
+  EXTERNAL_IP: "CHANGE_ME"

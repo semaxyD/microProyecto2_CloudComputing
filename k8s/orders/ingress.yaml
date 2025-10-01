@@ -5,12 +5,11 @@ metadata:
   namespace: microstore
   annotations:
     kubernetes.io/ingress.class: "nginx"
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
 spec:
   rules:
     - http:
         paths:
-          - path: /api/orders/?(.*)
+          - path: /api/orders
             pathType: Prefix
             backend:
               service:

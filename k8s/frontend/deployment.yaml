@@ -56,6 +56,11 @@ spec:
                 configMapKeyRef:
                   name: app-config
                   key: ORDERS_SERVICE_PORT
+            - name: EXTERNAL_IP
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: EXTERNAL_IP
           readinessProbe:
             httpGet:
               path: /

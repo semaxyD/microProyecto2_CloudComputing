@@ -42,6 +42,7 @@ data:
         ('oscar', 'oscar@gmail.com', 'oscar', '789'),
         ('ana', 'ana@gmail.com', 'ana', 'abc'),
         ('pedro', 'pedro@gmail.com', 'pedro', 'xyz'),
+        ('sebas', 'sebas@gmail.com', 'sebas', '$2a$12$Jqf9bdJptYH9XJ9yMzGqrOKMm4IT2hWjwP8gEQN05ozDD3TKDWTaO'),
         ('lucia', 'lucia@gmail.com', 'lucia', 'pass1');
 
     INSERT INTO products (name, price, description, stock) VALUES

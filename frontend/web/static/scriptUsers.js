@@ -1,7 +1,5 @@
-// Obtener las URLs desde las variables del template
-const USERS_SERVICE_URL = '{{ users_service_url }}';
-const PRODUCTS_SERVICE_URL = '{{ products_service_url }}';
-const ORDERS_SERVICE_URL = '{{ orders_service_url }}';
+// Las URLs se definen en index.html, no las redeclaramos aquí
+// const USERS_SERVICE_URL, PRODUCTS_SERVICE_URL, ORDERS_SERVICE_URL ya están disponibles
 
 function getUsers() {
     fetch(`${USERS_SERVICE_URL}/api/users`, {
