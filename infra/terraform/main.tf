@@ -74,15 +74,6 @@ resource "azurerm_kubernetes_cluster" "aks" {
     name       = "agentpool"
     node_count = var.node_count
     vm_size    = var.vm_size
-    
-    # Para mejor performance con MySQL
-    os_disk_size_gb = 50
-    max_pods        = 110
-    
-    # Habilitamos auto-scaling
-    enable_auto_scaling = true
-    min_count          = 1
-    max_count          = 5
   }
 
   identity {
