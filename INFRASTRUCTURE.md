@@ -38,9 +38,22 @@ az account set --subscription "12345678-1234-1234-1234-123456789012"
 az account show --query "name" --output tsv
 # Debe mostrar el nombre de tu suscripción
 
-# 1.6 Verificar que puedes crear recursos (verificar permisos)
+# 1.6 Verificar tenant actual
+az account show --query tenantId -o tsv
+# Debe de mostrar el Id del tenant
+
+# 1.7 Verificar que puedes crear recursos (verificar permisos)
 az group list --output table
 # Si ves una lista (aunque esté vacía), tienes permisos
+
+# 1.8 Exportamos los ID's para que terraform sepa donde operar
+export ARM_SUBSCRIPTION_ID="1234abcd-...."   # tu subscription ID real
+export ARM_TENANT_ID="abcd5678-...."         # tu tenant ID real
+#Podemos comprobar con:
+echo $ARM_SUBSCRIPTION_ID
+echo $ARM_TENANT_ID
+
+
 ```
 
 ### 🌍 PASO 1.5: Planificación de Región y Recursos (NUEVO)
