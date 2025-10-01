@@ -33,7 +33,7 @@ variable "location" {
   
   validation {
     condition = contains([
-      "East US", "East US 2", "West US", "West US 2", "West US 3",
+      "East US", "eastus2", "East US 2", "West US", "West US 2", "West US 3",
       "Central US", "South Central US", "West Central US", "North Central US",
       "West Europe", "North Europe", "UK South", "France Central"
     ], var.location)
