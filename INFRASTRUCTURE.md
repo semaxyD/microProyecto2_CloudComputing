@@ -229,35 +229,73 @@ kubectl get nodes
 ```
 
 
-### 🐳 PASO 5: Construir y Subir Imágenes Docker (DETALLADO)
+### 🐳 PASO 5: Construir y Subir Imágenes Docker
 
+**Tienes 2 opciones según tu entorno:**
+
+#### **Opción A: Azure Cloud Shell / Linux** ☁️ (ACR Tasks + Docker híbrido)
 ```bash
-# 5.1 Verificar que estás logueado en Azure
+# 5A.1 Verificar login en Azure
 az account show
-# Si no: az login
 
-# 5.2 Ejecutar el script de build automático (usa ACR Tasks)
+# 5A.2 Ejecutar script bash híbrido
 chmod +x scripts/build-images.sh
 ./scripts/build-images.sh
 
-# ☁️ El script usa ACR TASKS (sin Docker local):
-# - Obtiene el ACR name desde Terraform: terraform output -raw acr_name
-# - Verifica acceso al ACR: az acr show --name <acr-name>
-# - Build y push con ACR Tasks (cada uno toma 2-5 minutos):
-#   * az acr build --registry <acr> --image microstore-users:latest microUsers/
-#   * az acr build --registry <acr> --image microstore-products:latest microProducts/
-#   * az acr build --registry <acr> --image microstore-orders:latest microOrders/
-#   * az acr build --registry <acr> --image microstore-frontend:latest frontend/
+# ☁️ El script detecta automáticamente:
+# - Intenta ACR Tasks primero (si está disponible)
+# - Si falla, usa Docker local como fallback
+# - Build y push automático de 4 microservicios
+```
 
-# ✅ VENTAJAS de ACR Tasks vs Docker local:
-# - No necesita Docker instalado localmente
-# - Funciona perfecto en Azure Cloud Shell
-# - Build y push automático en un solo comando
-# - Logs detallados en Azure Portal
+#### **Opción B: Windows PowerShell** 🪟 (Docker Desktop + ACR)
+```powershell
+# 5B.1 Verificar Docker Desktop ejecutándose
+docker --version
+docker ps
 
-# 5.3 Verificar que las imágenes se subieron
-ACR_NAME=$(terraform -chdir=infra/terraform output -raw acr_name)
-az acr repository list --name $ACR_NAME --output table
+# 5B.2 Verificar login en Azure
+az account show
+
+# 5B.3 Ejecutar script PowerShell
+.\scripts\build-images.ps1
+
+# 🐳 El script PowerShell:
+# - Verifica Docker Desktop corriendo
+# - Login automático al ACR
+# - Build local de cada imagen
+# - Push directo al Azure Container Registry
+```
+
+#### **Resultado esperado (ambas opciones):**
+```bash
+# ✅ Output exitoso:
+📊 Resumen del Build:
+====================
+✅ Todas las imágenes se construyeron y subieron exitosamente
+
+🎯 Imágenes disponibles en ACR:
+  • microstoreacr[random].azurecr.io/microstore-users:latest
+  • microstoreacr[random].azurecr.io/microstore-products:latest  
+  • microstoreacr[random].azurecr.io/microstore-orders:latest
+  • microstoreacr[random].azurecr.io/microstore-frontend:latest
+
+# 5.3 Verificar imágenes en ACR
+ACR_NAME=$(terraform -chdir=infra/terraform output -raw acr_name)    # Linux/Cloud Shell
+$acrName = terraform -chdir=infra/terraform output -raw acr_name     # PowerShell
+
+az acr repository list --name $ACR_NAME --output table              # Ambos
+# Result
+# ----------------
+# microstore-users
+# microstore-products  
+# microstore-orders
+# microstore-frontend
+```
+
+#### **💡 Ventajas por método:**
+- **☁️ Cloud Shell**: Sin instalaciones locales, perfecto para desarrollo rápido
+- **🪟 PowerShell**: Control total, mejor para debugging, funciona siempre
 # Deberías ver:
 # Result
 # ----------------
